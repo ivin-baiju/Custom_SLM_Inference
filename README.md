@@ -445,10 +445,14 @@ python training/train_lora.py
 ```
 
 ### Publishing Checkpoints to Hugging Face:
-To share your fine-tuned weights publicly:
+To publish your fine-tuned weights publicly:
 ```bash
-huggingface-cli login
-huggingface-cli upload your-username/qwen2.5-0.5b-expert models/checkpoints/qwen2.5-0.5b-expert .
+# Interactive helper
+python training/upload_hf.py
+
+# Or via HF CLI
+hf auth login
+hf upload your-username/qwen2.5-0.5b-expert models/checkpoints/qwen2.5-0.5b-expert .
 ```
 
 ---
