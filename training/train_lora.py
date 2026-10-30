@@ -57,10 +57,11 @@ def load_conversational_dataset(jsonl_path: Path, tokenizer) -> Dataset:
 
 
 def main():
-    base_model_dir = Path("/Users/ivinbaiju/Stark/Markv0.0/models/checkpoints/qwen2.5-0.5b")
-    output_merged_dir = Path("/Users/ivinbaiju/Stark/Markv0.0/models/checkpoints/qwen2.5-0.5b-expert")
-    adapter_output_dir = Path("/Users/ivinbaiju/Stark/Markv0.0/training/adapters")
-    dataset_file = Path("/Users/ivinbaiju/Stark/Markv0.0/training/dataset.jsonl")
+    repo_root = Path(__file__).resolve().parent.parent
+    base_model_dir = repo_root / "models" / "checkpoints" / "qwen2.5-0.5b"
+    output_merged_dir = repo_root / "models" / "checkpoints" / "qwen2.5-0.5b-expert"
+    adapter_output_dir = repo_root / "training" / "adapters"
+    dataset_file = repo_root / "training" / "dataset.jsonl"
 
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     print(f"=== Starting LoRA Fine-Tuning on {device.upper()} (Apple M4) ===")
@@ -133,7 +134,7 @@ def main():
     tokenizer.save_pretrained(str(output_merged_dir))
 
     print(f"✓ Standalone fine-tuned model saved to: {output_merged_dir}")
-    print("Ready to run in Mark v0.0 Custom Inference Engine!")
+    print("Ready to run in SLM Inference Engine!")
 
 
 if __name__ == "__main__":

@@ -217,7 +217,8 @@ def run_kv_cache_ablation(model_path: str, device: str = "mps"):
 
 
 if __name__ == "__main__":
-    model_dir = "/Users/ivinbaiju/Stark/Markv0.0/models/checkpoints/qwen2.5-0.5b"
+    repo_root = Path(__file__).resolve().parent.parent
+    model_dir = str(repo_root / "models" / "checkpoints" / "qwen2.5-0.5b")
     run_logits_parity_test(model_dir, device="cpu")
     run_speed_benchmark(model_dir, device="mps")
     run_kv_cache_ablation(model_dir, device="mps")

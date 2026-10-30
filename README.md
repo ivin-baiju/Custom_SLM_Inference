@@ -1,6 +1,6 @@
 <div align="center">
 
-# ✦ Mark v0.0 ✦
+# ✦ SLM Inference Engine ✦
 
 ### *A bespoke SLM inference engine, hand-forged for Apple Silicon*
 
@@ -205,7 +205,7 @@ The central engineering challenge: loading a 3B-parameter model on a 16 GB Mac.
 └─────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────┐
-│  Mark v0.0 Zero-Copy Pipeline                                       │
+│  SLM Zero-Copy Pipeline                                             │
 │                                                                     │
 │  ┌──────────────────┐   ┌──────────────────┐   ┌────────────────┐  │
 │  │  Empty Model      │ + │  safe_open        │ → │  INT8 Quantize │  │
@@ -355,7 +355,7 @@ print(response.json()["choices"][0]["message"]["content"])
 ## ◈ Repository Structure
 
 ```
-Markv0.0/
+Custom_SLM_Inference/
 ├── models/
 │   ├── config.py                  # ModelConfig dataclass parser
 │   ├── registry.py                # Architecture registry
@@ -389,7 +389,7 @@ Markv0.0/
 │   ├── endpoints.py               # Pydantic schemas
 │   └── streaming.py               # SSE streaming generator
 ├── cli/
-│   └── main.py                    # Click CLI (slm/mark commands)
+│   └── main.py                    # Click CLI (slm commands)
 ├── dashboard/
 │   └── index.html                 # Real-time monitoring + chat UI
 ├── training/
@@ -428,15 +428,28 @@ Markv0.0/
 
 ---
 
-## ◈ Fine-Tuning
+## ◈ Fine-Tuning & Custom Expert Models
 
-LoRA fine-tuning pipeline built on PEFT + TRL:
+The repository includes a turnkey LoRA fine-tuning pipeline built on PEFT + TRL, specialized across 4 core domains:
 
-- **Domains** — Medicine · Cinema · C++ Systems Programming · Research
-- **Config** — LoRA rank 64, alpha 128, targeting `q_proj` / `v_proj`
-- **Trainable** — 8.8M parameters (1.75% of the model)
-- **Results** — Loss **2.744 → 1.566** over 5 epochs
-- **Deployment** — Adapters auto-merge to standalone checkpoints for zero-overhead inference
+- **Domains** — **Medicine & Pharmacology** · **Cinema & Screenplay Theory** · **Systems Programming (C++)** · **Scientific Research Methodology**
+- **Dataset** — Formatted conversational training pairs in [`training/dataset.jsonl`](training/dataset.jsonl)
+- **Config** — LoRA rank 64, alpha 128, targeting attention projections (`q_proj`, `v_proj`)
+- **Trainable** — 8.8M parameters (1.75% of model weights)
+- **Training Results** — Cross-entropy loss dropped from **2.744 → 1.566** over 5 epochs
+- **Auto-Merge** — Adapters are automatically merged into standalone checkpoints saved to `models/checkpoints/qwen2.5-0.5b-expert/` for zero-overhead inference
+
+### Re-training or Training Your Own Model:
+```bash
+python training/train_lora.py
+```
+
+### Publishing Checkpoints to Hugging Face:
+To share your fine-tuned weights publicly:
+```bash
+huggingface-cli login
+huggingface-cli upload your-username/qwen2.5-0.5b-expert models/checkpoints/qwen2.5-0.5b-expert .
+```
 
 ---
 
@@ -465,6 +478,6 @@ Released under the **MIT License**. See [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-<sub>Built with patience and PyTorch on Apple Silicon · Mark v0.0</sub>
+<sub>Built with PyTorch on Apple Silicon · Custom SLM Inference Engine</sub>
 
 </div>

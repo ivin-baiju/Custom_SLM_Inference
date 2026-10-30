@@ -145,6 +145,7 @@ def benchmark_end_to_end_quantization(model_path: str, device: str = "mps"):
 
 
 if __name__ == "__main__":
-    model_dir = "/Users/ivinbaiju/Stark/Markv0.0/models/checkpoints/qwen2.5-0.5b"
+    repo_root = Path(__file__).resolve().parent.parent
+    model_dir = str(repo_root / "models" / "checkpoints" / "qwen2.5-0.5b")
     benchmark_layer_quantization(model_dir)
     benchmark_end_to_end_quantization(model_dir, device="mps")
