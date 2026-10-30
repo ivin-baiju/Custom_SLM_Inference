@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mark v0.0 — Inference Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory:    { 50: '#FDFCFA', 100: '#FAF7F2', 200: '#F5F0E8', 300: '#EDE5D8', 400: '#E0D5C4', 500: '#D1C4AE' },
+            ink:      { 700: '#3D3832', 800: '#262320', 900: '#181614', 950: '#0F0E0D' },
+            gold:     { 300: '#D4C9A8', 400: '#C5A880', 500: '#B89B6A', 600: '#8C7355', 700: '#6B5840' },
+          },
+          fontFamily: {
+            sans:  ['"Inter"', 'system-ui', 'sans-serif'],
+            mono:  ['"JetBrains Mono"', '"SF Mono"', 'monospace'],
+            serif: ['"Playfair Display"', '"Times New Roman"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #F5F0E8; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #D1C4AE; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #C5A880; }
+
+    /* Markdown Rendering */
+    .prose p { margin-bottom: 0.6rem; line-height: 1.7; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin-left: 1.25rem; margin-bottom: 0.6rem; }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose li { margin-bottom: 0.2rem; }
+    .prose code:not(pre code) {
+      background: #EDE5D8;
+      color: #6B5840;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.2rem;
+      font-size: 0.85em;
+      font-weight: 500;
+    }
+    .prose pre {
+      background: #181614;
+      color: #FAF7F2;
+      border: 1px solid #3D3832;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      margin: 0.6rem 0;
+      overflow-x: auto;
+      font-size: 0.8rem;
+    }
+    .prose pre code {
+      background: transparent !important;
+      color: #FAF7F2 !important;
+      padding: 0 !important;
+    }
+    .prose strong { color: #181614; font-weight: 600; }
+    .prose h1, .prose h2, .prose h3 { font-family: 'Playfair Display', serif; color: #181614; margin-top: 1rem; margin-bottom: 0.4rem; }
+
+    /* Subtle grain texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Warm gold pulse */
+    @keyframes warmPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .warm-pulse { animation: warmPulse 2.5s ease-in-out infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-ivory-100 text-ink-900">
+
+  <!-- ═══════════ TOP NAVIGATION BAR ═══════════ -->
+  <header class="border-b border-ivory-400/60 bg-ivory-50/95 backdrop-blur-md sticky top-0 z-50 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3.5">
+      <!-- Logo Mark -->
+      <div class="w-10 h-10 rounded-lg bg-ink-900 flex items-center justify-center shadow-sm border border-ink-800">
+        <span class="text-ivory-100 font-serif font-bold text-lg tracking-tight">M</span>
+      </div>
+      <div>
+        <div class="flex items-center gap-2.5">
+          <h1 class="text-base font-serif font-bold tracking-tight text-ink-900">Mark <span class="font-mono text-xs font-medium text-gold-600">v0.0</span></h1>
+          <span class="text-[10px] font-medium uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-ivory-300 text-gold-700 border border-ivory-400 font-mono">SLM Runtime</span>
+        </div>
+        <p class="text-[11px] text-ink-700/60 font-light tracking-wide">Custom Inference Engine · Apple Silicon M4</p>
+      </div>
+    </div>
+
+    <!-- Status & Controls -->
+    <div class="flex items-center space-x-3 text-xs">
+      <!-- Engine Status Indicator -->
+      <div class="flex items-center space-x-2 bg-ivory-200/80 px-3 py-1.5 rounded-lg border border-ivory-400/50">
+        <span class="w-2 h-2 rounded-full bg-green-500 warm-pulse"></span>
+        <span id="backend-label" class="font-mono text-ink-800 text-[11px]">MPS · Apple M4</span>
+      </div>
+
+      <!-- Active Model Chip -->
+      <div class="flex items-center space-x-2 bg-ivory-200/80 px-3 py-1.5 rounded-lg border border-ivory-400/50">
+        <span class="text-ink-700/60 text-[11px]">Model:</span>
+        <span id="model-label" class="font-mono text-ink-900 font-semibold text-[11px]">qwen2.5-3b</span>
+        <span id="quant-label" class="px-1.5 py-0.5 rounded bg-ink-900 text-ivory-100 text-[9px] font-mono font-medium">INT8</span>
+        <button onclick="openModelModal()" class="ml-0.5 text-gold-600 hover:text-gold-700 transition p-0.5" title="Switch Model">
+          <i class="fa-solid fa-arrow-right-arrow-left text-[10px]"></i>
+        </button>
+      </div>
+
+      <!-- Metrics Link -->
+      <a href="/metrics" target="_blank" class="p-2 bg-ivory-200/60 hover:bg-ivory-300 border border-ivory-400/50 rounded-lg text-ink-700/60 hover:text-ink-900 transition" title="Prometheus Metrics">
+        <i class="fa-solid fa-chart-simple text-xs"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══════════ MAIN CONTENT GRID ═══════════ -->
+  <main class="flex-1 grid grid-cols-12 gap-5 p-5 max-w-[1800px] w-full mx-auto">
+
+    <!-- ──────── LEFT COLUMN: TELEMETRY (4 cols) ──────── -->
+    <section class="col-span-12 lg:col-span-4 space-y-4 flex flex-col">
+
+      <!-- Performance Metric Cards -->
+      <div class="grid grid-cols-2 gap-3">
+        <!-- TTFT -->
+        <div class="bg-ivory-50 border border-ivory-400/50 p-3.5 rounded-xl shadow-sm group hover:shadow-md hover:border-gold-400/40 transition-all duration-300">
+          <div class="flex justify-between items-center text-ink-700/50 text-[11px] font-medium uppercase tracking-wider mb-1.5">
+            <span>TTFT</span>
+            <i class="fa-solid fa-bolt text-gold-500 text-[10px]"></i>
+          </div>
+          <div class="text-2xl font-serif font-bold text-ink-900" id="stat-ttft">— <span class="text-xs font-sans font-normal text-ink-700/40">ms</span></div>
+          <p class="text-[10px] text-ink-700/40 mt-1 font-light">Prompt prefill latency</p>
+        </div>
+
+        <!-- TPOT -->
+        <div class="bg-ivory-50 border border-ivory-400/50 p-3.5 rounded-xl shadow-sm group hover:shadow-md hover:border-gold-400/40 transition-all duration-300">
+          <div class="flex justify-between items-center text-ink-700/50 text-[11px] font-medium uppercase tracking-wider mb-1.5">
+            <span>TPOT</span>
+            <i class="fa-solid fa-forward-step text-gold-600 text-[10px]"></i>
+          </div>
+          <div class="text-2xl font-serif font-bold text-ink-900" id="stat-tpot">— <span class="text-xs font-sans font-normal text-ink-700/40">ms</span></div>
+          <p class="text-[10px] text-ink-700/40 mt-1 font-light">Per-token decode</p>
+        </div>
+
+        <!-- Throughput -->
+        <div class="bg-ivory-50 border border-ivory-400/50 p-3.5 rounded-xl shadow-sm group hover:shadow-md hover:border-gold-400/40 transition-all duration-300">
+          <div class="flex justify-between items-center text-ink-700/50 text-[11px] font-medium uppercase tracking-wider mb-1.5">
+            <span>Throughput</span>
+            <i class="fa-solid fa-gauge-high text-gold-500 text-[10px]"></i>
+          </div>
+          <div class="text-2xl font-serif font-bold text-ink-900" id="stat-tps">— <span class="text-xs font-sans font-normal text-ink-700/40">tps</span></div>
+          <p class="text-[10px] text-ink-700/40 mt-1 font-light">Generation rate</p>
+        </div>
+
+        <!-- Token Counter -->
+        <div class="bg-ivory-50 border border-ivory-400/50 p-3.5 rounded-xl shadow-sm group hover:shadow-md hover:border-gold-400/40 transition-all duration-300">
+          <div class="flex justify-between items-center text-ink-700/50 text-[11px] font-medium uppercase tracking-wider mb-1.5">
+            <span>Tokens</span>
+            <i class="fa-solid fa-layer-group text-gold-600 text-[10px]"></i>
+          </div>
+          <div class="text-2xl font-serif font-bold text-ink-900" id="stat-tokens">0</div>
+          <p class="text-[10px] text-ink-700/40 mt-1 font-light">Session total</p>
+        </div>
+      </div>
+
+      <!-- KV Cache & Unified Memory -->
+      <div class="bg-ivory-50 border border-ivory-400/50 p-4 rounded-xl shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-ivory-300 pb-2.5">
+          <h3 class="text-xs font-semibold text-ink-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-memory text-gold-600 text-[10px]"></i>
+            Memory & Cache
+          </h3>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-ivory-300 text-gold-700 font-mono" id="kv-cache-type">Dynamic</span>
+        </div>
+
+        <!-- KV Cache Bar -->
+        <div>
+          <div class="flex justify-between text-[11px] text-ink-700/60 mb-1.5 font-mono">
+            <span>Context: <span id="kv-tokens" class="text-ink-900 font-semibold">0</span> / <span id="kv-max-tokens">2048</span></span>
+            <span id="kv-percent" class="text-gold-600 font-semibold">0%</span>
+          </div>
+          <div class="w-full bg-ivory-300 h-1.5 rounded-full overflow-hidden">
+            <div id="kv-bar" class="bg-gradient-to-r from-gold-500 to-gold-600 h-full w-[0%] transition-all duration-500 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- Unified RAM Bar -->
+        <div>
+          <div class="flex justify-between text-[11px] text-ink-700/60 mb-1.5 font-mono">
+            <span>Unified RAM: <span id="vram-alloc" class="text-ink-900 font-semibold">4.13 GB</span></span>
+            <span id="vram-percent" class="text-ink-700/50">25.8% of 16 GB</span>
+          </div>
+          <div class="w-full bg-ivory-300 h-1.5 rounded-full overflow-hidden">
+            <div id="vram-bar" class="bg-ink-900 h-full w-[26%] transition-all duration-500 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- Specs Grid -->
+        <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-3 border-t border-ivory-300">
+          <div class="bg-ivory-200/60 p-2 rounded-lg">
+            <span class="text-ink-700/40 block text-[9px] uppercase tracking-wider">Architecture</span>
+            <span class="text-ink-900 font-medium" id="spec-arch">Qwen2ForCausalLM</span>
+          </div>
+          <div class="bg-ivory-200/60 p-2 rounded-lg">
+            <span class="text-ink-700/40 block text-[9px] uppercase tracking-wider">Layers / Heads</span>
+            <span class="text-ink-900 font-medium" id="spec-layers">36L · 16Q · 2KV</span>
+          </div>
+          <div class="bg-ivory-200/60 p-2 rounded-lg">
+            <span class="text-ink-700/40 block text-[9px] uppercase tracking-wider">Vocab / Hidden</span>
+            <span class="text-ink-900 font-medium" id="spec-vocab">151,936 / 2048</span>
+          </div>
+          <div class="bg-ivory-200/60 p-2 rounded-lg">
+            <span class="text-ink-700/40 block text-[9px] uppercase tracking-wider">Precision</span>
+            <span class="text-gold-700 font-semibold" id="spec-precision">INT8</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TPOT Latency Chart -->
+      <div class="bg-ivory-50 border border-ivory-400/50 p-4 rounded-xl flex-1 flex flex-col min-h-[180px] shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-[11px] font-semibold text-ink-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-wave-square text-gold-600 text-[10px]"></i>
+            Decode Latency
+          </h3>
+          <span class="text-[9px] text-ink-700/40 font-mono">Last 30 tokens · ms</span>
+        </div>
+        <div class="flex-1 relative w-full h-[140px]">
+          <canvas id="latencyChart"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────── RIGHT COLUMN: CHAT CONSOLE (8 cols) ──────── -->
+    <section class="col-span-12 lg:col-span-8 flex flex-col bg-ivory-50 border border-ivory-400/50 rounded-xl overflow-hidden shadow-lg">
+
+      <!-- Toolbar -->
+      <div class="px-5 py-3 border-b border-ivory-300 bg-ivory-100/90 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-ink-900 flex items-center justify-center shadow-sm">
+            <i class="fa-solid fa-terminal text-ivory-100 text-sm"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-serif font-semibold text-ink-900">Inference Console</h2>
+            <p class="text-[10px] text-ink-700/40 font-light">Streaming generation over SSE</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs">
+          <!-- System Prompt Toggle -->
+          <button onclick="toggleSystemPrompt()" id="sys-prompt-btn" class="px-2.5 py-1.5 bg-ivory-200 hover:bg-ivory-300 text-ink-800 rounded-lg border border-ivory-400/50 transition flex items-center gap-1.5 text-[11px]">
+            <i class="fa-solid fa-sliders text-gold-600 text-[10px]"></i>
+            <span>Persona</span>
+          </button>
+
+          <!-- Temperature -->
+          <div class="flex items-center gap-1 bg-ivory-200/80 border border-ivory-400/50 px-2 py-1 rounded-lg">
+            <span class="text-ink-700/50 text-[10px]">T°</span>
+            <input type="number" id="param-temp" value="0.7" step="0.1" min="0" max="1.5" class="w-10 bg-transparent text-ink-900 font-mono text-[11px] text-center focus:outline-none">
+          </div>
+
+          <!-- Max Tokens -->
+          <div class="flex items-center gap-1 bg-ivory-200/80 border border-ivory-400/50 px-2 py-1 rounded-lg">
+            <span class="text-ink-700/50 text-[10px]">Max</span>
+            <input type="number" id="param-max" value="160" step="16" min="16" max="1024" class="w-12 bg-transparent text-ink-900 font-mono text-[11px] text-center focus:outline-none">
+          </div>
+
+          <!-- Clear -->
+          <button onclick="clearChat()" class="px-2 py-1.5 text-ink-700/40 hover:text-ink-900 hover:bg-ivory-300 rounded-lg transition" title="Clear">
+            <i class="fa-solid fa-trash-can text-[11px]"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- System Prompt Drawer -->
+      <div id="system-prompt-drawer" class="hidden bg-ivory-200/50 border-b border-ivory-300 p-4 space-y-3">
+        <div class="flex items-center justify-between text-[11px]">
+          <span class="font-semibold text-ink-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-user-pen text-gold-600 text-[10px]"></i>
+            System Prompt
+          </span>
+          <div class="flex items-center space-x-1.5">
+            <button onclick="setPersona('med')" class="px-2 py-0.5 rounded bg-ivory-300 hover:bg-gold-300 text-ink-800 text-[10px] transition border border-ivory-400/50">💊 Medical</button>
+            <button onclick="setPersona('film')" class="px-2 py-0.5 rounded bg-ivory-300 hover:bg-gold-300 text-ink-800 text-[10px] transition border border-ivory-400/50">🎬 Cinema</button>
+            <button onclick="setPersona('code')" class="px-2 py-0.5 rounded bg-ivory-300 hover:bg-gold-300 text-ink-800 text-[10px] transition border border-ivory-400/50">⚡ Systems</button>
+            <button onclick="setPersona('research')" class="px-2 py-0.5 rounded bg-ivory-300 hover:bg-gold-300 text-ink-800 text-[10px] transition border border-ivory-400/50">🔬 Research</button>
+          </div>
+        </div>
+        <textarea id="system-prompt-input" rows="2" class="w-full bg-ivory-50 border border-ivory-400/60 rounded-lg p-2.5 text-[11px] font-mono text-ink-800 focus:outline-none focus:border-gold-500 resize-none">You are an expert AI assistant specializing in medicine, cinema, systems programming, and scientific research. Provide precise, technically rigorous answers.</textarea>
+      </div>
+
+      <!-- Chat Messages -->
+      <div id="messages-container" class="flex-1 p-5 space-y-4 overflow-y-auto custom-scroll min-h-[460px] max-h-[580px]">
+        <!-- Welcome -->
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-ink-900 flex items-center justify-center text-ivory-100 text-xs shrink-0 mt-0.5 shadow-sm">
+            <span class="font-serif font-bold">M</span>
+          </div>
+          <div class="bg-ivory-200/60 border border-ivory-400/40 rounded-2xl rounded-tl-sm px-4 py-3.5 max-w-[88%] text-sm text-ink-800 shadow-sm">
+            <p class="font-serif font-semibold text-ink-900 mb-1 text-[13px]">Mark v0.0 — Ready</p>
+            <p class="text-[13px] leading-relaxed font-light">
+              Active: <strong class="font-mono text-ink-900" id="welcome-model-str">Qwen2.5-3B-Instruct (INT8)</strong> on <span class="font-mono text-gold-700">Apple Silicon M4</span>.
+              <br>Type a query below or select a prompt chip to begin streaming inference.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prompt Chips -->
+      <div class="px-5 py-2.5 bg-ivory-200/30 border-t border-ivory-300 flex items-center gap-2 overflow-x-auto custom-scroll text-[11px]">
+        <span class="text-ink-700/40 text-[10px] shrink-0 font-light italic">Try:</span>
+        <button onclick="sendQuickPrompt('Explain the pharmacodynamics and mechanism of ACE inhibitors.')" class="px-2.5 py-1 rounded-full bg-ivory-200 hover:bg-ivory-300 border border-ivory-400/50 text-ink-800 whitespace-nowrap transition hover:border-gold-400">
+          💊 ACE inhibitors
+        </button>
+        <button onclick="sendQuickPrompt('Analyze the motif of time dilation in Interstellar.')" class="px-2.5 py-1 rounded-full bg-ivory-200 hover:bg-ivory-300 border border-ivory-400/50 text-ink-800 whitespace-nowrap transition hover:border-gold-400">
+          🎬 Interstellar analysis
+        </button>
+        <button onclick="sendQuickPrompt('In C++, explain why std::move is a cast, not a byte-level operation.')" class="px-2.5 py-1 rounded-full bg-ivory-200 hover:bg-ivory-300 border border-ivory-400/50 text-ink-800 whitespace-nowrap transition hover:border-gold-400">
+          ⚡ C++ std::move
+        </button>
+        <button onclick="sendQuickPrompt('What is the difference between causal and bidirectional attention?')" class="px-2.5 py-1 rounded-full bg-ivory-200 hover:bg-ivory-300 border border-ivory-400/50 text-ink-800 whitespace-nowrap transition hover:border-gold-400">
+          🔬 Attention patterns
+        </button>
+      </div>
+
+      <!-- Input Area -->
+      <div class="p-4 bg-ivory-100/90 border-t border-ivory-300">
+        <form onsubmit="handleSend(event)" class="relative flex items-center">
+          <input 
+            type="text" 
+            id="user-input" 
+            placeholder="Type a message..." 
+            class="w-full bg-ivory-50 border border-ivory-400/60 rounded-xl px-4 py-3.5 pr-32 text-sm focus:outline-none focus:border-gold-500 text-ink-900 placeholder-ink-700/30 shadow-inner font-light"
+            autocomplete="off"
+          >
+          <div class="absolute right-2 flex items-center space-x-1.5">
+            <button type="button" id="stop-btn" onclick="stopGeneration()" class="hidden bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded-lg text-[11px] font-semibold shadow-sm flex items-center space-x-1 transition">
+              <i class="fa-solid fa-stop text-[10px]"></i>
+              <span>Stop</span>
+            </button>
+            <button type="submit" id="send-btn" class="bg-ink-900 hover:bg-ink-800 text-ivory-100 px-4 py-2 rounded-lg text-[11px] font-medium shadow-sm flex items-center space-x-1.5 transition disabled:opacity-40">
+              <span>Send</span>
+              <i class="fa-solid fa-arrow-up text-[10px]"></i>
+            </button>
+          </div>
+        </form>
+        <div class="flex items-center justify-between text-[10px] text-ink-700/40 px-1 mt-2 font-mono">
+          <span id="footer-engine-label">Qwen2.5-3B (INT8 · MPS)</span>
+          <span id="timing-tag" class="text-gold-600">Ready</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ═══════════ MODEL SWITCHER MODAL ═══════════ -->
+  <div id="model-modal" class="hidden fixed inset-0 z-50 bg-ink-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-ivory-50 border border-ivory-400 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-ivory-300 pb-3">
+        <h3 class="text-base font-serif font-bold text-ink-900 flex items-center gap-2">
+          <i class="fa-solid fa-arrow-right-arrow-left text-gold-600 text-sm"></i>
+          Switch Model
+        </h3>
+        <button onclick="closeModelModal()" class="text-ink-700/40 hover:text-ink-900 transition"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-medium text-ink-800 mb-1.5 uppercase tracking-wider">Checkpoint</label>
+          <select id="modal-model-select" class="w-full bg-ivory-200 border border-ivory-400 rounded-lg p-2.5 text-[11px] text-ink-900 focus:outline-none focus:border-gold-500 font-mono">
+            <option value="qwen2.5-3b">qwen2.5-3b (3.09B)</option>
+            <option value="qwen2.5-0.5b-expert">qwen2.5-0.5b-expert (LoRA)</option>
+            <option value="qwen2.5-0.5b">qwen2.5-0.5b (Base)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-medium text-ink-800 mb-1.5 uppercase tracking-wider">Quantization</label>
+          <select id="modal-quant-select" class="w-full bg-ivory-200 border border-ivory-400 rounded-lg p-2.5 text-[11px] text-ink-900 focus:outline-none focus:border-gold-500 font-mono">
+            <option value="int8">INT8 (Recommended · 4.1 GB)</option>
+            <option value="none">FP16 (Unquantized)</option>
+            <option value="int4">INT4 (Ultra-compact)</option>
+          </select>
+        </div>
+        <div id="modal-status-text" class="text-[11px] text-gold-600 font-mono hidden">
+          <i class="fa-solid fa-spinner animate-spin mr-1"></i> Loading...
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-2 border-t border-ivory-300">
+        <button onclick="closeModelModal()" class="px-4 py-2 rounded-lg text-[11px] font-medium text-ink-700 hover:bg-ivory-300 transition">Cancel</button>
+        <button onclick="confirmModelSwitch()" id="modal-confirm-btn" class="px-4 py-2 rounded-lg text-[11px] font-semibold bg-ink-900 hover:bg-ink-800 text-ivory-100 transition flex items-center gap-1.5">
+          Apply & Load
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ JAVASCRIPT ═══════════ -->
+  <script>
+    const API_BASE = window.location.origin;
+    let totalTokensGenerated = 0;
+    let latencyData = [];
+    let chatHistory = [];
+    let activeAbortController = null;
+
+    // Chart.js — warm ivory theme
+    const ctx = document.getElementById('latencyChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'TPOT (ms)',
+          data: latencyData,
+          borderColor: '#8C7355',
+          backgroundColor: 'rgba(197, 168, 128, 0.15)',
+          borderWidth: 1.5,
+          fill: true,
+          tension: 0.35,
+          pointRadius: 1.5,
+          pointHoverRadius: 3,
+          pointBackgroundColor: '#8C7355',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 200 },
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { display: false },
+          y: {
+            grid: { color: 'rgba(209, 196, 174, 0.4)' },
+            ticks: { color: '#8C7355', font: { family: 'JetBrains Mono', size: 9 } },
+            suggestedMin: 10,
+            suggestedMax: 40
+          }
+        }
+      }
+    });
+
+    // Personas
+    const personas = {
+      med: "You are an expert clinical pharmacologist. Provide accurate, structured clinical explanations with drug mechanisms, indications, and pharmacokinetics.",
+      film: "You are a cinema scholar and film theorist. Analyze structure, cinematography, thematic depth, and directorial motifs with precision.",
+      code: "You are a senior systems programmer specializing in C++, Rust, and low-level architectures. Write clean, memory-efficient code with clear explanations.",
+      research: "You are an academic researcher. Formulate hypotheses, explain statistical concepts, and provide rigorous analytical breakdowns."
+    };
+    function setPersona(key) {
+      if (personas[key]) {
+        document.getElementById('system-prompt-input').value = personas[key];
+        document.getElementById('system-prompt-drawer').classList.remove('hidden');
+      }
+    }
+    function toggleSystemPrompt() {
+      document.getElementById('system-prompt-drawer').classList.toggle('hidden');
+    }
+
+    // Model Modal
+    function openModelModal() {
+      document.getElementById('model-modal').classList.remove('hidden');
+      fetchAvailableModels();
+    }
+    function closeModelModal() {
+      document.getElementById('model-modal').classList.add('hidden');
+      document.getElementById('modal-status-text').classList.add('hidden');
+    }
+    async function fetchAvailableModels() {
+      try {
+        const res = await fetch(`${API_BASE}/v1/models/available`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.models && data.models.length > 0) {
+          const select = document.getElementById('modal-model-select');
+          select.innerHTML = '';
+          data.models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.name;
+            opt.textContent = `${m.name} (${m.size_mb} MB${m.is_active ? ' · ACTIVE' : ''})`;
+            if (m.is_active) opt.selected = true;
+            select.appendChild(opt);
+          });
+        }
+      } catch (e) {}
+    }
+    async function confirmModelSwitch() {
+      const modelName = document.getElementById('modal-model-select').value;
+      const quant = document.getElementById('modal-quant-select').value;
+      const statusText = document.getElementById('modal-status-text');
+      const confirmBtn = document.getElementById('modal-confirm-btn');
+      statusText.classList.remove('hidden');
+      statusText.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-1"></i> Loading ${modelName}...`;
+      confirmBtn.disabled = true;
+      try {
+        const res = await fetch(`${API_BASE}/v1/models/load`, {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ path: modelName, device: 'mps', precision: 'fp16', quantization: quant === 'none' ? null : quant })
+        });
+        if (res.ok) {
+          statusText.innerHTML = `<i class="fa-solid fa-check text-green-600 mr-1"></i> Loaded!`;
+          setTimeout(() => { closeModelModal(); pollStatus(); }, 600);
+        } else {
+          const err = await res.json();
+          statusText.innerHTML = `<span class="text-red-600">Error: ${err.detail || 'Failed'}</span>`;
+        }
+      } catch (e) {
+        statusText.innerHTML = `<span class="text-red-600">${e.message}</span>`;
+      } finally { confirmBtn.disabled = false; }
+    }
+
+    // Status Polling
+    async function pollStatus() {
+      try {
+        const res = await fetch(`${API_BASE}/v1/status`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.model_name) {
+          document.getElementById('model-label').textContent = data.model_name;
+          document.getElementById('welcome-model-str').textContent = `${data.model_name} (${data.precision || 'fp16'})`;
+          document.getElementById('footer-engine-label').textContent = `${data.model_name} · ${data.backend || 'mps'}`;
+        }
+        if (data.precision) document.getElementById('quant-label').textContent = data.precision.toUpperCase();
+        if (data.memory) {
+          const allocBytes = data.memory.allocated_bytes || 0;
+          const totalBytes = data.memory.total_bytes || (16 * 1024**3);
+          const allocGB = (allocBytes / (1024**3)).toFixed(2);
+          const totalGB = (totalBytes / (1024**3)).toFixed(0);
+          const pct = Math.min(100, Math.round((allocBytes / totalBytes) * 100));
+          document.getElementById('vram-alloc').textContent = `${allocGB} GB`;
+          document.getElementById('vram-percent').textContent = `${pct}% of ${totalGB} GB`;
+          document.getElementById('vram-bar').style.width = `${Math.max(5, pct)}%`;
+        }
+        if (data.config) {
+          document.getElementById('spec-arch').textContent = data.config.architecture || 'Unknown';
+          document.getElementById('spec-layers').textContent = `${data.config.layers}L · ${data.config.attention_heads}Q · ${data.config.kv_heads}KV`;
+          document.getElementById('spec-vocab').textContent = `${data.config.vocab_size?.toLocaleString()} / ${data.config.hidden_size}`;
+        }
+        if (data.kv_cache) {
+          const len = data.kv_cache.seq_length || 0;
+          const max = data.kv_cache.max_seq_len || 2048;
+          const pct = Math.min(100, Math.round((len / max) * 100));
+          document.getElementById('kv-tokens').textContent = len;
+          document.getElementById('kv-max-tokens').textContent = max;
+          document.getElementById('kv-percent').textContent = `${pct}%`;
+          document.getElementById('kv-bar').style.width = `${Math.max(len > 0 ? 3 : 0, pct)}%`;
+        }
+      } catch (e) {}
+    }
+    setInterval(pollStatus, 3000);
+
+    function clearChat() {
+      chatHistory = [];
+      const container = document.getElementById('messages-container');
+      container.innerHTML = `
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-ink-900 flex items-center justify-center text-ivory-100 text-xs shrink-0 mt-0.5">
+            <span class="font-serif font-bold">M</span>
+          </div>
+          <div class="bg-ivory-200/60 border border-ivory-400/40 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] text-sm text-ink-800">
+            Context cleared. Ready for your next query.
+          </div>
+        </div>`;
+      document.getElementById('kv-bar').style.width = '0%';
+      document.getElementById('kv-tokens').textContent = '0';
+      document.getElementById('kv-percent').textContent = '0%';
+    }
+    function sendQuickPrompt(text) {
+      document.getElementById('user-input').value = text;
+      handleSend(new Event('submit'));
+    }
+    function stopGeneration() {
+      if (activeAbortController) { activeAbortController.abort(); activeAbortController = null; }
+      document.getElementById('stop-btn').classList.add('hidden');
+      document.getElementById('send-btn').classList.remove('hidden');
+      document.getElementById('send-btn').disabled = false;
+      document.getElementById('timing-tag').textContent = 'Stopped';
+    }
+
+    async function handleSend(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('user-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      const sendBtn = document.getElementById('send-btn');
+      const stopBtn = document.getElementById('stop-btn');
+      sendBtn.classList.add('hidden');
+      stopBtn.classList.remove('hidden');
+      const container = document.getElementById('messages-container');
+
+      // User Bubble
+      container.innerHTML += `
+        <div class="flex items-start justify-end space-x-3">
+          <div class="bg-ink-900 text-ivory-100 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm shadow-sm leading-relaxed font-light">
+            ${escapeHtml(text)}
+          </div>
+        </div>`;
+
+      // Assistant Placeholder
+      const msgId = 'resp-' + Date.now();
+      container.innerHTML += `
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-ink-900 flex items-center justify-center text-ivory-100 text-xs shrink-0 mt-0.5 shadow-sm">
+            <span class="font-serif font-bold">M</span>
+          </div>
+          <div class="bg-ivory-200/60 border border-ivory-400/40 rounded-2xl rounded-tl-sm px-4 py-3.5 max-w-[88%] text-sm text-ink-800 prose leading-relaxed" id="${msgId}">
+            <span class="inline-block w-1.5 h-4 bg-gold-500 warm-pulse rounded-sm"></span>
+          </div>
+        </div>`;
+      container.scrollTop = container.scrollHeight;
+
+      const timingTag = document.getElementById('timing-tag');
+      timingTag.textContent = 'Prefilling...';
+
+      const sysPrompt = document.getElementById('system-prompt-input').value.trim();
+      const messages = [];
+      if (sysPrompt) messages.push({ role: 'system', content: sysPrompt });
+      chatHistory.forEach(m => messages.push(m));
+      messages.push({ role: 'user', content: text });
+
+      const t0 = performance.now();
+      let firstTokenTime = null, tokenCount = 0, fullText = '';
+      let outputBubble = document.getElementById(msgId);
+      activeAbortController = new AbortController();
+
+      try {
+        const response = await fetch(`${API_BASE}/v1/chat/completions`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          signal: activeAbortController.signal,
+          body: JSON.stringify({
+            messages, temperature: parseFloat(document.getElementById('param-temp').value) || 0.7,
+            max_tokens: parseInt(document.getElementById('param-max').value) || 160, stream: true
+          })
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith('data:')) continue;
+            const dataStr = trimmed.replace('data:', '').trim();
+            if (dataStr === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(dataStr);
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) {
+                if (!firstTokenTime) {
+                  firstTokenTime = performance.now() - t0;
+                  document.getElementById('stat-ttft').innerHTML = `${firstTokenTime.toFixed(1)} <span class="text-xs font-sans font-normal text-ink-700/40">ms</span>`;
+                }
+                tokenCount++; totalTokensGenerated++;
+                document.getElementById('stat-tokens').textContent = totalTokensGenerated;
+                fullText += delta;
+                outputBubble.innerHTML = marked.parse(fullText);
+                outputBubble.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+                container.scrollTop = container.scrollHeight;
+                if (tokenCount % 2 === 0) {
+                  const stepTime = (performance.now() - t0 - firstTokenTime) / tokenCount;
+                  chart.data.labels.push(`${chart.data.labels.length + 1}`);
+                  chart.data.datasets[0].data.push(stepTime);
+                  if (chart.data.labels.length > 30) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); }
+                  chart.update('none');
+                }
+              }
+            } catch (err) {}
+          }
+        }
+        const totalTime = performance.now() - t0;
+        const tpot = tokenCount > 1 ? (totalTime - firstTokenTime) / (tokenCount - 1) : 0;
+        const tps = totalTime > 0 ? (tokenCount / (totalTime / 1000)) : 0;
+        document.getElementById('stat-tpot').innerHTML = `${tpot.toFixed(1)} <span class="text-xs font-sans font-normal text-ink-700/40">ms</span>`;
+        document.getElementById('stat-tps').innerHTML = `${tps.toFixed(1)} <span class="text-xs font-sans font-normal text-ink-700/40">tps</span>`;
+        timingTag.textContent = `${tokenCount} tok · ${(totalTime/1000).toFixed(2)}s · ${tps.toFixed(1)} t/s`;
+        chatHistory.push({ role: 'user', content: text });
+        chatHistory.push({ role: 'assistant', content: fullText });
+        pollStatus();
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          outputBubble.innerHTML += `<div class="p-2 mt-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs">${err.message}</div>`;
+        }
+      } finally {
+        activeAbortController = null;
+        stopBtn.classList.add('hidden');
+        sendBtn.classList.remove('hidden');
+        sendBtn.disabled = false;
+      }
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"'`=\/]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'})[c]);
+    }
+    pollStatus();
+  </script>
+</body>
+</html>

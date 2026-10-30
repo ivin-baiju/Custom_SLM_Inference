@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel>=0.41.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mark-inference"
+version = "0.0.1"
+description = "Mark v0.0 — Custom SLM Inference Engine for Apple Silicon"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+authors = [
+    {name = "Ivin Baiju"},
+]
+
+dependencies = [
+    # Core ML
+    "torch>=2.2.0",
+    "numpy>=1.26.0",
+    "safetensors>=0.4.0",
+
+    # HuggingFace ecosystem
+    "tokenizers>=0.19.0",
+    "transformers>=4.40.0",
+
+    # API server
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.29.0",
+    "sse-starlette>=2.0.0",
+
+    # CLI & output
+    "click>=8.1.0",
+    "rich>=13.7.0",
+
+    # Observability
+    "prometheus-client>=0.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
+
+[project.scripts]
+slm = "cli.main:cli"
+mark = "cli.main:cli"
+
+[tool.setuptools.packages.find]
+include = [
+    "runtime*",
+    "models*",
+    "backends*",
+    "cache*",
+    "quantization*",
+    "tokenizer*",
+    "scheduler*",
+    "server*",
+    "monitoring*",
+    "benchmarks*",
+    "cli*",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests that load real models (deselect with '-m \"not slow\"')",
+    "gpu: marks tests that require MPS/CUDA",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "SIM", "TCH"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
