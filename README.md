@@ -302,10 +302,14 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e .
 ```
 
-### Download & Quantize a Model
+### Download & Load a Model
 
 ```bash
-slm load models/checkpoints/qwen2.5-3b --quantization int8
+# Load directly from Hugging Face Hub (auto-downloads to models/checkpoints/)
+slm load ivin-baiju/qwen2.5-0.5b-expert
+
+# Or load 3B with INT8 quantization on Apple Silicon M4
+slm load Qwen/Qwen2.5-3B-Instruct --quantization int8
 ```
 
 ### Run Inference
@@ -418,11 +422,11 @@ Custom_SLM_Inference/
 
 <div align="center">
 
-| Model | Parameters | VRAM (INT8) | Throughput | Status |
-|:---|:---:|:---:|:---:|:---:|
-| Qwen2.5-0.5B-Instruct | 502M | ~480 MB | 48.3 tps | ✅ Verified |
-| Qwen2.5-0.5B-Expert | 502M | ~480 MB | 48.3 tps | ✅ Fine-tuned |
-| Qwen2.5-3B-Instruct | 3.09B | 4.13 GB | ~15 tps | ✅ Verified |
+| Model | Parameters | VRAM (INT8) | Throughput | Hub Checkpoint |
+|:---|:---:|:---:|:---:|:---|
+| **Qwen2.5-0.5B-Expert** | 502M | ~480 MB | 48.3 tps | [`ivin-baiju/qwen2.5-0.5b-expert`](https://huggingface.co/ivin-baiju/qwen2.5-0.5b-expert) |
+| Qwen2.5-3B-Instruct | 3.09B | 4.13 GB | ~15 tps | [`Qwen/Qwen2.5-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) |
+| Qwen2.5-0.5B-Instruct | 502M | ~480 MB | 48.3 tps | [`Qwen/Qwen2.5-0.5B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) |
 
 </div>
 

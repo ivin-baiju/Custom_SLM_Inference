@@ -92,7 +92,23 @@ class ModelLoader:
         import gc
         path = Path(model_path)
         if not path.exists():
-            raise FileNotFoundError(f"Model path does not exist: {path}")
+            # Check if in local checkpoints
+            checkpoint_dir = Path(__file__).resolve().parent.parent / "models" / "checkpoints" / str(model_path)
+            if checkpoint_dir.exists():
+                path = checkpoint_dir
+            elif "/" in str(model_path):
+                # Auto-download from Hugging Face Hub
+                logger.info("Model '%s' not found locally. Downloading from Hugging Face Hub...", model_path)
+                try:
+                    from huggingface_hub import snapshot_download
+                    clean_name = str(model_path).split("/")[-1]
+                    target_dir = Path(__file__).resolve().parent.parent / "models" / "checkpoints" / clean_name
+                    target_dir.mkdir(parents=True, exist_ok=True)
+                    path = Path(snapshot_download(repo_id=str(model_path), local_dir=str(target_dir)))
+                except Exception as e:
+                    raise FileNotFoundError(f"Could not find or download model '{model_path}': {e}")
+            else:
+                raise FileNotFoundError(f"Model path does not exist: {path}")
 
         # 1. Parse Config
         config = load_config(path)
