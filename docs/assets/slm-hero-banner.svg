@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 330" width="100%" height="330" role="img" aria-label="SLM Inference Engine — Anodized Silicon &amp; EUV Cobalt Architecture Banner">
+  <defs>
+    <linearGradient id="chassisBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="55%" stop-color="#F1F4F9"/>
+      <stop offset="100%" stop-color="#E6ECF4"/>
+    </linearGradient>
+    <linearGradient id="cobaltTeal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="50%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
+    <linearGradient id="dieSurface" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#080C14"/>
+    </linearGradient>
+    <pattern id="waferDots" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#CBD5E1" fill-opacity="0.75"/>
+    </pattern>
+    <style>
+      .display { font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .sans { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .mono { font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+      @keyframes kvFill1 { 0%, 15% { fill: #1E293B; } 25%, 90% { fill: #2563EB; } 100% { fill: #1E293B; } }
+      @keyframes kvFill2 { 0%, 30% { fill: #1E293B; } 40%, 90% { fill: #2563EB; } 100% { fill: #1E293B; } }
+      @keyframes kvFill3 { 0%, 45% { fill: #1E293B; } 55%, 90% { fill: #3B82F6; } 100% { fill: #1E293B; } }
+      @keyframes kvFill4 { 0%, 60% { fill: #1E293B; } 70%, 90% { fill: #0D9488; } 100% { fill: #1E293B; } }
+      @keyframes kvFill5 { 0%, 75% { fill: #1E293B; } 82%, 90% { fill: #14B8A6; } 100% { fill: #1E293B; } }
+
+      @keyframes waveShift {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-4px); }
+      }
+      @keyframes barScaleA {
+        0%, 100% { transform: scaleY(0.65); }
+        50% { transform: scaleY(1); }
+      }
+      @keyframes barScaleB {
+        0%, 100% { transform: scaleY(0.95); }
+        50% { transform: scaleY(0.55); }
+      }
+      @keyframes statusLed {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.35; }
+      }
+
+      .kv-1 { animation: kvFill1 4.8s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .kv-2 { animation: kvFill2 4.8s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .kv-3 { animation: kvFill3 4.8s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .kv-4 { animation: kvFill4 4.8s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .kv-5 { animation: kvFill5 4.8s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .rope-wave { animation: waveShift 3.2s ease-in-out infinite; }
+      .bar-a { transform-origin: center bottom; animation: barScaleA 2.4s ease-in-out infinite; }
+      .bar-b { transform-origin: center bottom; animation: barScaleB 2.4s ease-in-out infinite; }
+      .led { animation: statusLed 2.2s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Outer Anodized Aluminum Chassis -->
+  <rect x="2" y="2" width="1196" height="326" rx="18" fill="url(#chassisBg)" stroke="#CBD5E1" stroke-width="1.5"/>
+  <rect x="10" y="10" width="1180" height="310" rx="12" fill="url(#waferDots)"/>
+
+  <!-- Top Accent Lithography Strip -->
+  <rect x="2" y="2" width="1196" height="6" rx="3" fill="url(#cobaltTeal)"/>
+
+  <!-- Left Column: Typography & Engineering Identity -->
+  <g transform="translate(44, 42)">
+    <!-- Pill Badge -->
+    <rect x="0" y="0" width="356" height="28" rx="14" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1"/>
+    <circle cx="16" cy="14" r="4.5" fill="#059669" class="led"/>
+    <text x="30" y="18" fill="#0B121E" font-size="11" font-weight="600" letter-spacing="0.8" class="mono">ANODIZED SILICON · PYTORCH MPS RUNTIME</text>
+
+    <!-- Title -->
+    <text x="0" y="76" fill="#0B121E" font-size="40" font-weight="700" letter-spacing="-1.2" class="display">Custom SLM Inference Engine</text>
+    <text x="0" y="106" fill="#2563EB" font-size="16" font-weight="600" letter-spacing="-0.2" class="sans">From-Scratch Autoregressive Transformer Runtime &amp; Hardware Telemetry Workbench</text>
+
+    <!-- Description -->
+    <text x="0" y="140" fill="#475569" font-size="13.5" class="sans">Hand-written RoPE, Grouped-Query Attention (GQA), SwiGLU, Paged KV Cache, and zero-copy</text>
+    <text x="0" y="160" fill="#475569" font-size="13.5" class="sans">safe_open INT8/INT4 weight streaming — fitting 3B models into 4.13 GB on 16 GB Apple Silicon.</text>
+
+    <!-- 4 Hardware Readout Cards -->
+    <g transform="translate(0, 184)">
+      <rect x="0" y="0" width="152" height="62" rx="10" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1"/>
+      <text x="14" y="22" fill="#64748B" font-size="10" font-weight="600" letter-spacing="0.6" class="mono">LOGITS PARITY</text>
+      <text x="14" y="46" fill="#0B121E" font-size="18" font-weight="700" class="mono">1.000002</text>
+
+      <rect x="164" y="0" width="152" height="62" rx="10" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1"/>
+      <text x="178" y="22" fill="#64748B" font-size="10" font-weight="600" letter-spacing="0.6" class="mono">0.5B THROUGHPUT</text>
+      <text x="178" y="46" fill="#2563EB" font-size="18" font-weight="700" class="mono">48.3 tok/s</text>
+
+      <rect x="328" y="0" width="152" height="62" rx="10" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1"/>
+      <text x="342" y="22" fill="#64748B" font-size="10" font-weight="600" letter-spacing="0.6" class="mono">3B INT8 VRAM</text>
+      <text x="342" y="46" fill="#0D9488" font-size="18" font-weight="700" class="mono">4.13 GB</text>
+
+      <rect x="492" y="0" width="152" height="62" rx="10" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1"/>
+      <text x="506" y="22" fill="#64748B" font-size="10" font-weight="600" letter-spacing="0.6" class="mono">KV CACHE SPEEDUP</text>
+      <text x="506" y="46" fill="#4F46E5" font-size="18" font-weight="700" class="mono">1.88×</text>
+    </g>
+  </g>
+
+  <!-- Right Column: Deep Silicon Die Telemetry Module -->
+  <g transform="translate(724, 34)">
+    <rect x="0" y="0" width="436" height="262" rx="14" fill="url(#dieSurface)" stroke="#1E293B" stroke-width="1.5"/>
+
+    <!-- Module Header -->
+    <rect x="0" y="0" width="436" height="36" rx="14" fill="#111827"/>
+    <circle cx="20" cy="18" r="4" fill="#3B82F6" class="led"/>
+    <text x="34" y="22" fill="#F8FAFC" font-size="11" font-weight="600" letter-spacing="0.8" class="mono">M4 MPS DIE · LIVE TENSOR &amp; KV INSPECTOR</text>
+    <text x="418" y="22" text-anchor="end" fill="#14B8A6" font-size="10.5" font-weight="600" class="mono">FP16 / INT8</text>
+
+    <!-- Sub-panel 1: Paged KV Cache Block Allocation Matrix -->
+    <g transform="translate(18, 50)">
+      <text x="0" y="12" fill="#94A3B8" font-size="10" font-weight="600" letter-spacing="0.6" class="mono">PAGED KV CACHE BLOCK MATRIX (16 PAGES × 16 TOKENS)</text>
+      <g transform="translate(0, 22)">
+        <rect x="0"   y="0" width="21" height="20" rx="4" fill="#2563EB"/>
+        <rect x="25"  y="0" width="21" height="20" rx="4" fill="#2563EB"/>
+        <rect x="50"  y="0" width="21" height="20" rx="4" fill="#2563EB"/>
+        <rect x="75"  y="0" width="21" height="20" rx="4" class="kv-1"/>
+        <rect x="100" y="0" width="21" height="20" rx="4" class="kv-2"/>
+        <rect x="125" y="0" width="21" height="20" rx="4" class="kv-3"/>
+        <rect x="150" y="0" width="21" height="20" rx="4" class="kv-4"/>
+        <rect x="175" y="0" width="21" height="20" rx="4" class="kv-5"/>
+        <rect x="200" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+        <rect x="225" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+        <rect x="250" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+        <rect x="275" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+        <rect x="300" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+        <rect x="325" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+        <rect x="350" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+        <rect x="375" y="0" width="21" height="20" rx="4" fill="#1E293B"/>
+      </g>
+    </g>
+
+    <!-- Sub-panel 2: RoPE Phase Harmonic & Step TPOT Bars -->
+    <g transform="translate(18, 112)">
+      <rect x="0" y="0" width="194" height="84" rx="8" fill="#0B111E" stroke="#1E293B" stroke-width="1"/>
+      <text x="12" y="18" fill="#94A3B8" font-size="9.5" font-weight="600" class="mono">RoPE θ = 1,000,000 PHASE</text>
+      <path d="M 14 54 Q 38 30, 62 54 T 110 54 T 158 54 T 182 54" fill="none" stroke="#6366F1" stroke-width="2.2" class="rope-wave"/>
+      <path d="M 14 54 Q 38 74, 62 54 T 110 54 T 158 54 T 182 54" fill="none" stroke="#14B8A6" stroke-width="1.6" stroke-opacity="0.75"/>
+      <text x="12" y="75" fill="#64748B" font-size="9.5" class="mono">[B, H_q=14, L, d_k=64]</text>
+
+      <rect x="206" y="0" width="194" height="84" rx="8" fill="#0B111E" stroke="#1E293B" stroke-width="1"/>
+      <text x="218" y="18" fill="#94A3B8" font-size="9.5" font-weight="600" class="mono">DECODE STEP LATENCY (MS)</text>
+      <g transform="translate(222, 28)">
+        <rect x="0"   y="12" width="12" height="32" rx="2" fill="#2563EB" class="bar-a"/>
+        <rect x="20"  y="8"  width="12" height="36" rx="2" fill="#2563EB" class="bar-b"/>
+        <rect x="40"  y="14" width="12" height="30" rx="2" fill="#3B82F6" class="bar-a"/>
+        <rect x="60"  y="10" width="12" height="34" rx="2" fill="#3B82F6" class="bar-b"/>
+        <rect x="80"  y="15" width="12" height="29" rx="2" fill="#0D9488" class="bar-a"/>
+        <rect x="100" y="9"  width="12" height="35" rx="2" fill="#0D9488" class="bar-b"/>
+        <rect x="120" y="12" width="12" height="32" rx="2" fill="#14B8A6" class="bar-a"/>
+        <rect x="140" y="11" width="12" height="33" rx="2" fill="#14B8A6" class="bar-b"/>
+      </g>
+      <text x="218" y="75" fill="#14B8A6" font-size="9.5" class="mono">TTFT 36.8ms · TPOT 20.7ms</text>
+    </g>
+
+    <!-- Sub-panel 3: 4-Stage Pipeline Indicator Strip -->
+    <g transform="translate(18, 210)">
+      <rect x="0"   y="0" width="94" height="34" rx="6" fill="#1E293B"/>
+      <text x="47"  y="21" text-anchor="middle" fill="#94A3B8" font-size="10" font-weight="600" class="mono">1. TOKENIZE</text>
+
+      <rect x="102" y="0" width="94" height="34" rx="6" fill="#1E293B"/>
+      <text x="149" y="21" text-anchor="middle" fill="#94A3B8" font-size="10" font-weight="600" class="mono">2. PREFILL</text>
+
+      <rect x="204" y="0" width="102" height="34" rx="6" fill="#2563EB"/>
+      <text x="255" y="21" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="700" class="mono">3. GQA DECODE</text>
+
+      <rect x="314" y="0" width="86" height="34" rx="6" fill="#0D9488"/>
+      <text x="357" y="21" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="700" class="mono">4. SSE OUT</text>
+    </g>
+  </g>
+</svg>

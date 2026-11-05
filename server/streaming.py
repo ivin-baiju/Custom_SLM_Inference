@@ -37,27 +37,35 @@ async def stream_chat_completion(
 
     # Format prompt from messages
     messages_dicts = [{"role": m.role, "content": m.content} for m in request.messages]
-    
     stop_seqs = [request.stop] if isinstance(request.stop, str) else (request.stop or [])
 
-    # Stream delta tokens
-    generator = engine.chat(
-        messages=messages_dicts,
+    if not engine.tokenizer_processor:
+        raise RuntimeError("No tokenizer available in engine.")
+
+    prompt = engine.tokenizer_processor.apply_chat_template(
+        messages_dicts, add_generation_prompt=True
+    )
+
+    last_telemetry = None
+    for _, delta_text, telemetry in engine.generate_with_telemetry(
+        prompt=prompt,
         max_tokens=request.max_tokens,
         temperature=request.temperature,
         top_k=request.top_k,
         top_p=request.top_p,
-        stream=True,
-    )
-
-    for delta_text in generator:
+        repetition_penalty=request.repetition_penalty,
+        stop_sequences=stop_seqs,
+        request_id=req_id.replace("chatcmpl-", ""),
+    ):
+        last_telemetry = telemetry
         chunk = ChatCompletionChunk(
             id=req_id,
             created=created_time,
             model=model_name,
             choices=[StreamChoice(index=0, delta=DeltaMessage(content=delta_text))],
+            telemetry=telemetry,
         )
-        yield ServerSentEvent(data=chunk.model_dump_json())
+        yield ServerSentEvent(data=chunk.model_dump_json(exclude_none=True))
 
     # Send final finish chunk
     final_chunk = ChatCompletionChunk(
@@ -65,6 +73,7 @@ async def stream_chat_completion(
         created=created_time,
         model=model_name,
         choices=[StreamChoice(index=0, delta=DeltaMessage(), finish_reason="stop")],
+        telemetry=last_telemetry,
     )
-    yield ServerSentEvent(data=final_chunk.model_dump_json())
+    yield ServerSentEvent(data=final_chunk.model_dump_json(exclude_none=True))
     yield ServerSentEvent(data="[DONE]")

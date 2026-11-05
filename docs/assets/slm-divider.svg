@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 24" width="100%" height="24" role="presentation">
+  <defs>
+    <linearGradient id="euvTrace" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4DFED" stop-opacity="0.2"/>
+      <stop offset="25%" stop-color="#2563EB" stop-opacity="0.75"/>
+      <stop offset="50%" stop-color="#4F46E5" stop-opacity="0.9"/>
+      <stop offset="75%" stop-color="#0D9488" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#D4DFED" stop-opacity="0.2"/>
+    </linearGradient>
+    <style>
+      @keyframes nodePulse {
+        0%, 100% { opacity: 0.95; }
+        50% { opacity: 0.35; }
+      }
+      .node { animation: nodePulse 2.8s ease-in-out infinite; }
+    </style>
+  </defs>
+  <line x1="0" y1="12" x2="1200" y2="12" stroke="url(#euvTrace)" stroke-width="1.5"/>
+  <rect x="582" y="8" width="36" height="8" rx="4" fill="#F1F4F9" stroke="#2563EB" stroke-width="1.2"/>
+  <circle cx="600" cy="12" r="2.2" fill="#2563EB" class="node"/>
+</svg>

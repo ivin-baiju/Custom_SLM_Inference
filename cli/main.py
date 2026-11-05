@@ -160,7 +160,8 @@ def status_cmd():
 @click.option("--host", default="0.0.0.0", help="Host interface to bind")
 @click.option("--port", default=8000, help="Port to listen on")
 @click.option("--model", default=None, help="Optional model path to auto-load")
-def serve_cmd(host, port, model):
+@click.option("--demo", is_flag=True, help="Auto-bootstrap synthetic micro Qwen2 model if no model is loaded")
+def serve_cmd(host, port, model, demo):
     """Start the OpenAI-compatible HTTP/SSE API server."""
     import uvicorn
     if model:
@@ -168,7 +169,7 @@ def serve_cmd(host, port, model):
         global_engine.load_model(model)
     else:
         active = load_active_model()
-        if active and active.get("path"):
+        if active and active.get("path") and Path(active["path"]).exists():
             console.print(f"[bold blue]Pre-loading active model:[/] {active['path']} (quantization={active.get('quantization')})")
             global_engine.load_model(
                 model_path=active["path"],
@@ -176,6 +177,9 @@ def serve_cmd(host, port, model):
                 precision=active.get("precision", "fp16"),
                 quantization=active.get("quantization"),
             )
+        elif demo:
+            console.print("[bold cyan]Bootstrapping synthetic micro Qwen2 model (INT8)...[/]")
+            global_engine.load_synthetic_demo_model(quantization="int8")
 
     console.print(f"[bold green]Starting SLM Inference Server on http://{host}:{port}[/]")
     uvicorn.run(app, host=host, port=port)

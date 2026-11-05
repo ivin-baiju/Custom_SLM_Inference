@@ -1,491 +1,321 @@
 <div align="center">
 
-# ✦ SLM Inference Engine ✦
+<img src="./docs/assets/slm-hero-banner.svg" alt="Custom SLM Inference Engine — Anodized Silicon & EUV Cobalt Hardware Telemetry Banner" width="100%" />
 
-### *A bespoke SLM inference engine, hand-forged for Apple Silicon*
+<br />
 
-<br>
+![Python](https://img.shields.io/badge/Python-3.12+-2563EB?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=python)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x_MPS%2FCUDA-2563EB?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=pytorch)
+![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-M4_Unified_RAM-0D9488?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=apple)
+![OpenAI Compatible](https://img.shields.io/badge/OpenAI-SSE_Telemetry-4F46E5?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=openai)
+![Tests](https://img.shields.io/badge/Tests-20_Passing-059669?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=pytest)
+![License](https://img.shields.io/badge/License-MIT-2563EB?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9)
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&color=181614&logoColor=FAF7F2&logo=python)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.x-red?style=for-the-badge&color=181614&logoColor=FAF7F2&logo=pytorch)
-![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-M4-silver?style=for-the-badge&color=181614&logoColor=FAF7F2&logo=apple)
-![OpenAI Compatible](https://img.shields.io/badge/OpenAI-Compatible-green?style=for-the-badge&color=181614&logoColor=FAF7F2&logo=openai)
-![License](https://img.shields.io/badge/License-MIT-gold?style=for-the-badge&color=181614&logoColor=FAF7F2)
-![Tests](https://img.shields.io/badge/Tests-19_Passing-success?style=for-the-badge&color=181614&logoColor=FAF7F2&logo=pytest)
+<br />
 
-<br>
-
-> *A from-scratch transformer inference runtime — no wrappers, no `transformers.generate()`, no shortcuts.*
-> *Every RoPE rotation, every GQA head, every SwiGLU gate is hand-written PyTorch,*
-> *streaming safetensor weights layer-by-layer to fit a 3B model in 4 GB on a 16 GB Mac.*
-
-<br>
+> **A from-scratch autoregressive transformer inference runtime and hardware telemetry workbench.**  
+> No wrappers, no `transformers.generate()`, no black-box shortcuts. Every RoPE phase rotation, Grouped-Query Attention head expansion, SwiGLU gate, Paged KV Cache block, and zero-copy `safe_open` INT8/INT4 weight stream is hand-written in PyTorch — fitting a 3B parameter model into **4.13 GB** on a 16 GB Apple Silicon Mac.
 
 </div>
 
----
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
-## ◈ Benchmarks
+## ◈ Interactive 3-Workspace Hardware & Inference Workbench
+
+<div align="center">
+  <img src="./docs/assets/slm-workbench-animated.svg" alt="Animated 3-Workspace Anodized Silicon & EUV Cobalt Inference Workbench" width="100%" />
+</div>
+
+The web workbench ([`dashboard/index.html`](./dashboard/index.html) & GitHub Pages [`docs/index.html`](./docs/index.html)) is engineered around an **Anodized Silicon & EUV Cobalt** design language (`#F1F4F9` machined aluminum chassis, `#2563EB` EUV Cobalt, `#0D9488` Unified Memory Teal, `#4F46E5` RoPE Indigo, and a toggleable `#080C14` **Deep Silicon Die** dark mode):
+
+| Workspace | Core Capabilities | Live Runtime Binding |
+| :--- | :--- | :--- |
+| **1 · Inference Console** | Live 4-stage execution pipeline bar (`1. Tokenize → 2. Prefill → 3. GQA Decode → 4. Output`), token-by-token SSE streaming, one-click code copy, per-message telemetry receipts (`TTFT`, `tok/s`, `step_ms`, `KV Δ`), collapsible **Sampling & Persona Drawer** (`Cmd/Ctrl + ,`), and real-time TPOT waveform chart. | `POST /v1/chat/completions` (SSE + per-step server telemetry) |
+| **2 · Pipeline & KV Inspector** | Interactive 6-stage PyTorch tensor shape graph (`[B, L, D] → [B, H_q, L, d_k] → [B, L, V]`), live **32-Page KV Cache Block Matrix** (`DynamicKVCache`, `StaticKVCache`, `PagedKVCache`), and real-time `InferenceProfiler` waterfall traces. | `GET /v1/status` (`kv_cache` + `recent_traces` + `config`) |
+| **3 · Zero-Copy Memory Lab** | Interactive Apple Silicon 16 GB Unified RAM OOM & Quantization Calculator comparing standard HuggingFace state-dict duplication vs `safe_open` layer-by-layer streaming (`FP16`, `INT8`, `INT4`) across `0.5B`, `1.5B`, `3B`, and `7B` models. | [`cache/memory_manager.py`](./cache/memory_manager.py) & [`models/loader.py`](./models/loader.py) |
+
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
+
+## ◈ Animated 6-Stage Autoregressive Tensor & Zero-Copy Pipeline
+
+<div align="center">
+  <img src="./docs/assets/slm-architecture-animated.svg" alt="Animated 6-Stage Autoregressive GQA & Zero-Copy Safetensors Execution Pipeline" width="100%" />
+</div>
+
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
+
+## ◈ Measured Benchmarks (Apple Silicon M4 MPS)
 
 <div align="center">
 
-<table>
-<tr>
-<td align="center" width="25%">
-
-**Logits Parity**
-<br><br>
-<code>1.00000179</code>
-<br>
-<sub>Cosine similarity vs HuggingFace</sub>
-
-</td>
-<td align="center" width="25%">
-
-**Qwen2.5-0.5B · M4 MPS**
-<br><br>
-<code>48.3 tps</code> FP16
-<br>
-<sub>36.8 ms TTFT · 20.7 ms TPOT</sub>
-
-</td>
-<td align="center" width="25%">
-
-**Qwen2.5-3B · M4 MPS**
-<br><br>
-<code>~15 tps</code> INT8
-<br>
-<sub>Only 4.13 GB VRAM</sub>
-
-</td>
-<td align="center" width="25%">
-
-**KV Cache Speedup**
-<br><br>
-<code>1.88×</code>
-<br>
-<sub>With cache vs without</sub>
-
-</td>
-</tr>
-</table>
+| Metric | Target / Baseline | Measured Result | Hardware / Precision |
+| :--- | :--- | :--- | :--- |
+| **Logits Parity vs HuggingFace** | Cosine Similarity $\ge 0.9999$ | **`1.00000179`** (`max_diff = 0.00498`) | Apple M4 MPS · `FP16` |
+| **Qwen2.5-0.5B Throughput** | Real-time interactive | **`48.3 tok/s`** (`36.8 ms` TTFT · `20.7 ms` TPOT) | Apple M4 MPS · `FP16` |
+| **Qwen2.5-3B Peak Memory** | `< 12.0 GB` on 16 GB Mac | **`4.13 GB`** (down from `13.0 GB` OOM) | Apple M4 MPS · `INT8` Zero-Copy |
+| **KV Cache Decode Speedup** | Autoregressive reuse | **`1.88×`** faster vs uncached recomputation | `DynamicKVCache` / `PagedKVCache` |
+| **Automated Test Suite** | Unit + API + SSE Streaming | **`20 / 20 Passing`** (`1.84s`) | PyTorch 2.x · `pytest` |
 
 </div>
 
----
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
-## ◈ Architecture Overview
+## ◈ System Architecture
 
 ```mermaid
 flowchart TD
-    A["📝 Prompt"] --> B["🔤 Tokenizer"]
-    B --> C["⚡ Prefill\n(KV Cache Init)"]
-    C --> D["🔁 Transformer Layers"]
+    A["📝 User Prompt / ChatML"] --> B["🔤 Tokenizer Processor"]
+    B --> C["⚡ Prefill Phase\n(Full Sequence Forward + KV Init)"]
+    C --> D["🔁 N × Transformer Decoder Blocks"]
 
-    subgraph D["🔁 Transformer Layers"]
+    subgraph D["🔁 N × Transformer Decoder Blocks"]
         direction TB
-        D1["🌀 RoPE\nRotary Position Embedding"] --> D2["👁️ GQA Attention\nGrouped-Query Attention"]
-        D2 --> D3["⚙️ SwiGLU MLP\nSiLU Gated Linear Unit"]
-        D3 --> D4["📏 RMSNorm"]
+        D1["📏 Pre-Attention RMSNorm\nFP32 Variance Upcast"] --> D2["🌀 QKV Projection + RoPE\nθ = 1,000,000 Rotary Embedding"]
+        D2 --> D3["👁️ Grouped-Query Attention (GQA)\nrepeat_interleave KV + Causal Mask"]
+        D3 --> D4["⚙️ Post-Attention RMSNorm + SwiGLU MLP\nSiLU(gate_proj) ⊙ up_proj"]
     end
 
-    D --> E["🎯 LM Head"]
-    E --> F["🎲 Sampling"]
+    D --> E["🎯 Final RMSNorm + LM Head"]
+    E --> F["🎲 Logits Processor & Sampler\nRepetition Penalty · Temp · Top-K · Top-P"]
+    F --> G["📡 OpenAI SSE Stream + Telemetry Bus\nTTFT · Step Latency · KV Occupancy · Profiler Spans"]
 
-    subgraph F["🎲 Sampling"]
-        direction TB
-        F1["Greedy"] ~~~ F2["Temperature"]
-        F2 ~~~ F3["Top-K / Top-P"]
-        F3 ~~~ F4["Repetition Penalty"]
-    end
+    G --> H["🖥️ 3-Workspace Web Workbench"]
+    G --> I["💻 Click CLI (slm)"]
+    G --> J["📈 Prometheus /metrics"]
 
-    F --> G["📡 SSE Stream"]
-    G --> H["📊 Dashboard"]
-    G --> I["💻 CLI"]
-    G --> J["🔌 OpenAI API"]
-
-    style A fill:#FAF7F2,stroke:#8C7355,color:#181614
-    style B fill:#FAF7F2,stroke:#8C7355,color:#181614
-    style C fill:#EDE5D8,stroke:#8C7355,color:#181614
-    style E fill:#EDE5D8,stroke:#8C7355,color:#181614
-    style G fill:#EDE5D8,stroke:#8C7355,color:#181614
-    style H fill:#FAF7F2,stroke:#C5A880,color:#181614
-    style I fill:#FAF7F2,stroke:#C5A880,color:#181614
-    style J fill:#FAF7F2,stroke:#C5A880,color:#181614
+    style A fill:#F1F4F9,stroke:#2563EB,color:#0B121E
+    style B fill:#F1F4F9,stroke:#2563EB,color:#0B121E
+    style C fill:#E6ECF4,stroke:#2563EB,color:#0B121E
+    style E fill:#E6ECF4,stroke:#0D9488,color:#0B121E
+    style F fill:#F1F4F9,stroke:#4F46E5,color:#0B121E
+    style G fill:#E6ECF4,stroke:#0D9488,color:#0B121E
+    style H fill:#F1F4F9,stroke:#2563EB,color:#0B121E
+    style I fill:#F1F4F9,stroke:#4F46E5,color:#0B121E
+    style J fill:#F1F4F9,stroke:#0D9488,color:#0B121E
 ```
 
----
+### Supported Model Architectures
 
-## ◈ Supported Architectures
+| Architecture Class | Model Families | Key Structural Traits | Status |
+| :--- | :--- | :--- | :---: |
+| [`Qwen2ForCausalLM`](./models/architectures/qwen.py) | Qwen 2, Qwen 2.5 (`0.5B`, `1.5B`, `3B`, `7B`) | GQA (`14 Q / 2 KV` or `16 Q / 2 KV`), QKV bias enabled, $\theta = 10^6$, SwiGLU | ✅ Active |
+| [`LlamaForCausalLM`](./models/architectures/llama.py) | Llama 2, Llama 3, Mistral, CodeLlama | GQA/MHA, bias-free projections, RoPE, SwiGLU | ✅ Ready |
+| [`Phi3ForCausalLM`](./models/architectures/phi.py) | Microsoft Phi-3, Phi-3.5 Mini | High-density GQA + SwiGLU decoder blocks | ✅ Ready |
+| [`Gemma2ForCausalLM`](./models/architectures/gemma.py) | Google Gemma, Gemma 2 | $\sqrt{d_{\text{model}}}$ embedding normalizer, zero-centered `(1 + weight)` RMSNorm | ✅ Ready |
 
-<div align="center">
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
-| Architecture | Models | Status |
-|:---|:---|:---:|
-| `LlamaForCausalLM` | Llama 2/3, Mistral, CodeLlama | ✅ |
-| `Qwen2ForCausalLM` | Qwen 2, Qwen 2.5 | ✅ Active |
-| `Phi3ForCausalLM` | Phi-3, Phi-3.5 | ✅ |
-| `Gemma2ForCausalLM` | Gemma, Gemma 2 | ✅ |
+## ◈ Core Engineering Deep-Dive
 
-</div>
+### 1 · Zero-Copy `safe_open` Streaming & In-Flight Quantization
 
----
+Loading a 3B parameter model in standard FP16 (`6.5 GB`) via `torch.load` or `from_pretrained` instantiates both the empty model and the state dictionary simultaneously (`~13.0 GB` peak RAM), triggering an Out-Of-Memory crash on 16 GB Apple Silicon Macs where macOS reserves `~4 GB` for the OS and WindowServer.
 
-## ◈ Core Components
-
-### 1 · Multi-Architecture Decoder Runtime
-
-Hand-written PyTorch from the ground up — RoPE with θ = 1,000,000 base frequency, Grouped-Query Attention with `repeat_interleave` for KV head expansion, SwiGLU activation (SiLU gating), and RMSNorm. No `transformers` dependency at inference time.
-
-### 2 · Zero-Copy Memory Streaming
-
-`safe_open` layer-by-layer streaming solves the **13 GB OOM wall** on 16 GB Macs. Instead of materializing the full state dict in memory, weights are streamed directly from safetensor files and quantized in-flight. Drops 3B model peak memory from **13 GB → 4.13 GB**.
-
-### 3 · KV Cache Strategies
-
-| Cache | Description |
-|:---|:---|
-| `DynamicKVCache` | Grows with sequence length, simplest implementation |
-| `StaticKVCache` | Pre-allocated fixed-size buffer for predictable memory |
-| `PagedKVCache` | vLLM-style block allocation for efficient batching |
-| `PrefixCacheManager` | Trie-based prefix sharing across requests |
-
-### 4 · Quantization Engine
-
-- **INT8** — Symmetric per-tensor quantization with FP16 scale factors
-- **INT4** — Group-wise nibble-packed into `uint8`, 2× compression over INT8
-
-### 5 · OpenAI-Compatible API
-
-| Method | Endpoint | Description |
-|:---|:---|:---|
-| `POST` | `/v1/chat/completions` | Chat completions with SSE streaming |
-| `GET` | `/v1/models` | List loaded models |
-| `POST` | `/v1/models/load` | Load a model at runtime |
-| `GET` | `/v1/models/available` | List available local checkpoints |
-| `GET` | `/v1/status` | Engine status & metrics |
-
-### 6 · Interactive Dashboard
-
-Real-time monitoring UI built with Chart.js — TPOT latency graph, TTFT counter, unified memory meter, KV cache gauge, and multi-turn chat with Markdown rendering. Ships as a single `index.html`, served by the FastAPI backend.
-
-### 7 · CLI
-
-```
-slm load      Load & quantize a model checkpoint
-slm run       Run single-shot inference
-slm serve     Launch the API server + dashboard
-slm architectures   List supported model architectures
-slm status    Show engine status
-```
-
-### 8 · LoRA Fine-Tuning
-
-PEFT + TRL pipeline across 4 domains — Medicine, Cinema, C++ Systems Programming, and Research. LoRA rank 64, alpha 128, targeting 8.8M trainable parameters (1.75% of model). Auto-merges adapters to standalone checkpoints for zero-overhead inference.
-
----
-
-<details>
-<summary><strong>◈ Memory Optimization Deep-Dive</strong></summary>
-
-<br>
-
-The central engineering challenge: loading a 3B-parameter model on a 16 GB Mac.
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  Standard Loading (HuggingFace-style)                               │
-│                                                                     │
-│  ┌──────────────────┐   ┌──────────────────┐                        │
-│  │  Empty Model      │ + │  State Dict       │ = 13 GB Peak         │
-│  │  (6.5 GB FP16)   │   │  (6.5 GB FP16)   │                       │
-│  └──────────────────┘   └──────────────────┘                        │
-│                                                                     │
-│  ❌  OOM on 16 GB Mac (macOS needs ~4 GB)                           │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
-│  SLM Zero-Copy Pipeline                                             │
-│                                                                     │
-│  ┌──────────────────┐   ┌──────────────────┐   ┌────────────────┐  │
-│  │  Empty Model      │ + │  safe_open        │ → │  INT8 Quantize │  │
-│  │  (6.5 GB FP16)   │   │  (0 extra memory) │   │  in-flight     │  │
-│  └──────────────────┘   └──────────────────┘   └────────────────┘  │
-│                                                                     │
-│  ✅  4.13 GB on MPS — fits comfortably with headroom               │
-└─────────────────────────────────────────────────────────────────────┘
-```
+[`models/loader.py`](./models/loader.py) solves this by opening `.safetensors` files via memory-mapped `safe_open`, reading a single tensor slice at a time, quantizing linear layers to `INT8` or `INT4` **in-flight**, binding the compressed parameter directly to the target module, and immediately freeing the temporary FP16 slice.
 
 ```mermaid
 flowchart LR
-    A["Safetensor\nFile on Disk"] -->|"safe_open\n(zero-copy mmap)"| B["Layer N\nWeights (FP16)"]
-    B -->|"Quantize\nin-flight"| C["Layer N\nWeights (INT8)"]
-    C -->|"Assign to\nmodel.layer_n"| D["Model on\nMPS Device"]
-    D -->|"Free FP16\ntensor"| E["Next Layer\n→ Repeat"]
+    A["Safetensors on Disk"] -->|"safe_open (mmap)"| B["Single Tensor Slice (FP16)"]
+    B -->|"In-Flight Quantize"| C["QuantizedLinear (INT8 / INT4)"]
+    C -->|"Bind to Submodule"| D["Apple M4 MPS Unified Memory"]
+    D -->|"del slice + gc"| E["Next Layer (4.13 GB Peak)"]
 
-    style A fill:#FAF7F2,stroke:#8C7355,color:#181614
-    style B fill:#F5F0E8,stroke:#8C7355,color:#181614
-    style C fill:#EDE5D8,stroke:#8C7355,color:#181614
-    style D fill:#EDE5D8,stroke:#C5A880,color:#181614
-    style E fill:#FAF7F2,stroke:#C5A880,color:#181614
+    style A fill:#F1F4F9,stroke:#2563EB,color:#0B121E
+    style B fill:#E6ECF4,stroke:#2563EB,color:#0B121E
+    style C fill:#E6ECF4,stroke:#0D9488,color:#0B121E
+    style D fill:#E6ECF4,stroke:#4F46E5,color:#0B121E
+    style E fill:#F1F4F9,stroke:#059669,color:#0B121E
 ```
 
-</details>
+### 2 · Multi-Strategy KV Cache Engine
 
----
+| Strategy | Module | Mechanism & Tradeoff |
+| :--- | :--- | :--- |
+| **`DynamicKVCache`** | [`cache/kv_cache.py`](./cache/kv_cache.py) | Concatenates `[B, H_kv, S, d_k]` tensors along the sequence dimension on each decode step. Zero pre-allocation waste for short prompts. |
+| **`StaticKVCache`** | [`cache/kv_cache.py`](./cache/kv_cache.py) | Pre-allocates contiguous `[B, H_kv, S_max, d_k]` buffers at model load time and writes via in-place slice indexing (`k_cache[:, :, start:end] = k`), eliminating allocator fragmentation. |
+| **`PagedKVCache`** | [`cache/block_manager.py`](./cache/block_manager.py) | vLLM-inspired non-contiguous physical page table (`page_size = 16` tokens per block), allocating blocks on demand. |
+| **`PrefixCacheManager`** | [`cache/prefix_cache.py`](./cache/prefix_cache.py) | Trie-based token prefix matcher that shares pre-computed KV blocks across multi-turn conversations sharing a system prompt. |
+
+### 3 · Mathematical Formulations
 
 <details>
-<summary><strong>◈ Math · Rotary Position Embedding (RoPE)</strong></summary>
+<summary><strong>Rotary Position Embedding (RoPE · θ = 1,000,000)</strong></summary>
 
-<br>
+<br />
 
-RoPE encodes position information by rotating query and key vectors in 2D subspaces:
+RoPE encodes relative token positions by rotating query and key representations in 2D complex subspaces ([`models/architectures/transformer.py`](./models/architectures/transformer.py)):
 
-$$\theta_i = \frac{1}{\text{base}^{\,2i\,/\,d}} \quad \text{where base} = 1{,}000{,}000$$
+$$\theta_i = \frac{1}{\text{base}^{\,2i\,/\,d_k}}, \quad \text{base} = 1{,}000{,}000$$
 
-For position $m$ and dimension pair $(2i, 2i+1)$:
+For token position $m$ and feature pair $(2i, 2i+1)$:
 
 $$\begin{bmatrix} q_{2i}' \\ q_{2i+1}' \end{bmatrix} = \begin{bmatrix} \cos(m\theta_i) & -\sin(m\theta_i) \\ \sin(m\theta_i) & \cos(m\theta_i) \end{bmatrix} \begin{bmatrix} q_{2i} \\ q_{2i+1} \end{bmatrix}$$
 
-The rotation preserves the dot-product structure such that attention scores depend on *relative* position $m - n$, not absolute indices.
+</details>
+
+<details>
+<summary><strong>Grouped-Query Attention (GQA)</strong></summary>
+
+<br />
+
+GQA shares each Key/Value head across $G = H_q / H_{kv}$ query heads (`7:1` in Qwen2.5-0.5B and `8:1` in Qwen2.5-3B), reducing KV cache footprint by up to $87.5\%$:
+
+$$K_{\text{exp}} = \text{repeat\_interleave}(K, G, \dim=1), \quad V_{\text{exp}} = \text{repeat\_interleave}(V, G, \dim=1)$$
+
+$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{Q K_{\text{exp}}^\top}{\sqrt{d_k}} + M_{\text{causal}}\right) V_{\text{exp}}$$
 
 </details>
 
 <details>
-<summary><strong>◈ Math · Grouped-Query Attention (GQA)</strong></summary>
+<summary><strong>INT8 Symmetric & INT4 Group-Wise Nibble Quantization</strong></summary>
 
-<br>
+<br />
 
-GQA reduces KV memory by sharing key-value heads across multiple query heads:
-
-$$\text{num\_kv\_groups} = \frac{\text{num\_heads}}{\text{num\_kv\_heads}}$$
-
-Each KV head is expanded via `repeat_interleave` to match the query head count:
-
-$$K_{\text{expanded}} = \text{repeat\_interleave}(K, \text{num\_kv\_groups}, \dim=1)$$
-
-$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{Q \, K_{\text{expanded}}^\top}{\sqrt{d_k}}\right) V_{\text{expanded}}$$
-
-This gives Multi-Head Attention quality at a fraction of the KV cache cost.
+- **INT8 Symmetric** ([`quantization/int8.py`](./quantization/int8.py)):
+  $$\text{scale} = \frac{\max(|W|)}{127}, \quad W_q = \text{clamp}\!\left(\text{round}\!\left(\frac{W}{\text{scale}}\right), -128, 127\right) \in \mathbb{Z}_8$$
+- **INT4 Group-Wise** ([`quantization/int4.py`](./quantization/int4.py)):
+  Groups weights into blocks of size $g = 128$, maps to $[-8, 7]$, offsets by $+8$ into $[0, 15]$, and packs two 4-bit nibbles into each `uint8` byte (`high_nibble << 4 | low_nibble`) for **4× compression** over FP16.
 
 </details>
 
-<details>
-<summary><strong>◈ Math · INT8 Symmetric Quantization</strong></summary>
-
-<br>
-
-Per-tensor symmetric quantization maps FP16 weights to 8-bit integers:
-
-$$\text{scale} = \frac{\max(|W|)}{127}$$
-
-$$W_q = \text{round}\!\left(\frac{W}{\text{scale}}\right) \in [-128, 127]$$
-
-At inference, dequantization reconstructs the approximate weight:
-
-$$\hat{W} = W_q \times \text{scale}$$
-
-The scale factor is stored in FP16, adding negligible overhead (one float per tensor).
-
-</details>
-
----
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
 ## ◈ Quickstart
 
-### Install
+### 1 · Install
 
 ```bash
 git clone https://github.com/ivin-baiju/Custom_SLM_Inference.git
 cd Custom_SLM_Inference
-python -m venv .venv && source .venv/bin/activate
-pip install -e .
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
 ```
 
-### Download & Load a Model
+### 2 · Instant Zero-Download Demo Mode (Recommended First Run)
+
+Launch the FastAPI server and 3-workspace workbench immediately using the built-in **Synthetic Micro-Model (`qwen2.5-micro-synthetic`)** — a 4-layer `Qwen2ForCausalLM` safetensors checkpoint generated on-the-fly that executes real PyTorch `RMSNorm → RoPE → GQA → SwiGLU` + `DynamicKVCache` forward passes with zero multi-gigabyte download required:
 
 ```bash
-# Load directly from Hugging Face Hub (auto-downloads to models/checkpoints/)
+slm serve --demo --port 8000
+# Open http://localhost:8000/dashboard
+```
+
+### 3 · Load Full HuggingFace / Local Checkpoints
+
+```bash
+# Load fine-tuned Qwen2.5-0.5B-Expert from HuggingFace Hub
 slm load ivin-baiju/qwen2.5-0.5b-expert
 
-# Or load 3B with INT8 quantization on Apple Silicon M4
+# Load Qwen2.5-3B-Instruct with zero-copy INT8 quantization on Apple Silicon MPS
 slm load Qwen/Qwen2.5-3B-Instruct --quantization int8
+
+# Run single-shot CLI generation
+slm run -p "Explain the mechanism of ACE inhibitors" -m 128
 ```
 
-### Run Inference
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
-```bash
-slm run -p "Explain the mechanism of ACE inhibitors" -m 100
-```
+## ◈ REST API & Telemetry Endpoints
 
-### Launch the Dashboard
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/v1/chat/completions` | OpenAI-compatible chat completion (`stream: true/false`) with per-token `telemetry` (`ttft_ms`, `step_ms`, `kv_seq_len`) |
+| `POST` | `/v1/models/demo` | Bootstrap the instant in-repo 4-layer `qwen2.5-micro-synthetic` checkpoint (`FP16`/`INT8`, `dynamic`/`static`/`paged` cache) |
+| `POST` | `/v1/models/load` | Load & quantize a local or HuggingFace checkpoint at runtime |
+| `POST` | `/v1/models/switch` | Hot-swap model, quantization (`none`/`int8`/`int4`), or KV cache strategy (`dynamic`/`static`/`paged`) |
+| `POST` | `/v1/models/unload` | Unload active weights and reclaim Apple Silicon Unified Memory |
+| `GET` | `/v1/models/available` | List discovered local checkpoints + synthetic micro-model |
+| `GET` | `/v1/status` | Full runtime status: model config, KV cache occupancy, `MetricsCollector` aggregates, and `InferenceProfiler` waterfall traces |
+| `GET` | `/metrics` | Prometheus text exposition format (`slm_requests_total`, `slm_ttft_ms_avg`, `slm_tokens_per_second_avg`, `slm_memory_used_mb`) |
 
-```bash
-slm serve --port 8000
-# Open http://127.0.0.1:8000
-```
-
----
-
-## ◈ API Reference
-
-### cURL — Streaming
+### Example: Streaming SSE with Real-Time Telemetry
 
 ```bash
 curl -N http://127.0.0.1:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "messages": [{"role": "user", "content": "What is GQA attention?"}],
-    "max_tokens": 128,
+    "messages": [{"role": "user", "content": "Explain std::move in C++"}],
+    "max_tokens": 64,
+    "temperature": 0.7,
+    "repetition_penalty": 1.1,
     "stream": true
   }'
 ```
 
-### Python
-
-```python
-import requests
-
-response = requests.post("http://127.0.0.1:8000/v1/chat/completions", json={
-    "messages": [{"role": "user", "content": "Explain RoPE embeddings"}],
-    "max_tokens": 128,
-    "stream": False
-})
-print(response.json()["choices"][0]["message"]["content"])
-```
-
----
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
 ## ◈ Repository Structure
 
-```
+```text
 Custom_SLM_Inference/
 ├── models/
-│   ├── config.py                  # ModelConfig dataclass parser
-│   ├── registry.py                # Architecture registry
-│   ├── loader.py                  # Zero-copy safe_open streaming loader
+│   ├── config.py                  # ModelConfig parser (Llama, Qwen2, Phi3, Gemma2)
+│   ├── registry.py                # Architecture registry & factory
+│   ├── loader.py                  # Zero-copy safe_open streaming & in-flight quantization
 │   └── architectures/
-│       ├── transformer.py         # RMSNorm, RoPE, GQA Attention, SwiGLU, TransformerBlock
-│       ├── llama.py               # LlamaForCausalLM
+│       ├── transformer.py         # Hand-written RMSNorm, RoPE, GQA Attention, SwiGLU
 │       ├── qwen.py                # Qwen2ForCausalLM
+│       ├── llama.py               # LlamaForCausalLM
 │       ├── phi.py                 # Phi3ForCausalLM
 │       └── gemma.py               # Gemma2ForCausalLM
 ├── backends/
-│   ├── base.py                    # ExecutionBackend ABC + auto-detection
-│   ├── mps.py                     # Apple Silicon MPS backend
+│   ├── base.py                    # ExecutionBackend ABC + hardware auto-detection
+│   ├── mps.py                     # Apple Silicon Metal Performance Shaders (MPS)
 │   ├── cuda.py                    # NVIDIA CUDA backend
-│   └── cpu.py                     # CPU fallback
+│   └── cpu.py                     # CPU fallback backend
 ├── cache/
-│   ├── kv_cache.py                # Dynamic & Static KV Cache
-│   ├── block_manager.py           # Paged KV Cache (vLLM-style)
-│   ├── prefix_cache.py            # Trie-based prefix caching
-│   └── memory_manager.py          # Memory estimation
+│   ├── kv_cache.py                # DynamicKVCache & StaticKVCache
+│   ├── block_manager.py           # PagedKVCache (vLLM-style 16-token block tables)
+│   ├── prefix_cache.py            # Trie-based PrefixCacheManager
+│   └── memory_manager.py          # Unified RAM & KV cache footprint estimator
 ├── quantization/
-│   ├── int8.py                    # Symmetric INT8 quantization
-│   └── int4.py                    # Group-wise INT4 quantization
+│   ├── int8.py                    # Per-tensor symmetric INT8 QuantizedLinear
+│   └── int4.py                    # Group-wise nibble-packed INT4 QuantizedLinearInt4
 ├── runtime/
-│   ├── engine.py                  # Main InferenceEngine orchestrator
-│   ├── generation.py              # Prefill/decode loop + sampling
-│   ├── lifecycle.py               # Model state machine
-│   └── request.py                 # GenerationConfig, InferenceRequest
+│   ├── engine.py                  # InferenceEngine + SyntheticDomainTokenizer + Telemetry
+│   ├── generation.py              # Prefill/decode loop + Temp / Top-K / Top-P / Repetition Penalty
+│   ├── lifecycle.py               # ModelLifecycleState machine
+│   └── request.py                 # GenerationConfig & InferenceRequest
 ├── server/
-│   ├── api.py                     # FastAPI + OpenAI endpoints
-│   ├── endpoints.py               # Pydantic schemas
-│   └── streaming.py               # SSE streaming generator
-├── cli/
-│   └── main.py                    # Click CLI (slm commands)
+│   ├── api.py                     # FastAPI application + OpenAI & telemetry routes
+│   ├── endpoints.py               # Pydantic request/response & telemetry schemas
+│   └── streaming.py               # Server-Sent Events (SSE) generator with step timings
 ├── dashboard/
-│   └── index.html                 # Real-time monitoring + chat UI
-├── training/
-│   ├── train_lora.py              # LoRA fine-tuning script
-│   └── dataset.jsonl              # Multi-domain training data
-├── tokenizer/
-│   ├── loader.py                  # Tokenizer loading
-│   └── processor.py               # Chat template processing
+│   └── index.html                 # 3-Workspace Anodized Silicon & EUV Cobalt Workbench
+├── docs/
+│   ├── index.html                 # GitHub Pages live interactive workbench
+│   └── assets/                    # Animated SVG architecture & workbench diagrams
 ├── monitoring/
-│   ├── metrics.py                 # Prometheus metrics
-│   └── profiler.py                # Request profiler
-├── benchmarks/
-│   ├── compare_hf.py              # HuggingFace parity benchmark
-│   ├── latency.py                 # Latency benchmarks
-│   ├── throughput.py              # Throughput benchmarks
-│   ├── memory.py                  # Memory benchmarks
-│   └── quant_benchmark.py         # Quantization benchmark
-├── tests/                         # 19 passing tests
-├── pyproject.toml                 # Package config
-└── README.md
+│   ├── metrics.py                 # Prometheus MetricsCollector
+│   └── profiler.py                # Phase-level InferenceProfiler (tokenize/prefill/decode)
+├── training/
+│   ├── train_lora.py              # PEFT + TRL LoRA fine-tuning pipeline
+│   └── dataset.jsonl              # Multi-domain conversational dataset
+├── benchmarks/                    # HF parity, latency, throughput, memory & quant suites
+└── tests/                         # 20 unit & API integration tests
 ```
 
----
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
-## ◈ Models
+## ◈ LoRA Fine-Tuning & Verification
+
+### Multi-Domain LoRA Adapter Pipeline ([`training/train_lora.py`](./training/train_lora.py))
+- **Domains**: Medicine & Pharmacology · Cinema & Screenplay Theory · Systems Programming (C++) · Transformer Research
+- **Configuration**: LoRA rank $r = 64$, $\alpha = 128$, targeting `q_proj` and `v_proj` ($8.8\text{M}$ trainable parameters, $1.75\%$ of base model)
+- **Convergence**: Cross-entropy loss reduced from **`2.744 → 1.566`** across 5 epochs; auto-merged into standalone `.safetensors` weights (`ivin-baiju/qwen2.5-0.5b-expert`).
+
+### Running the Test Suite
+
+```bash
+pytest tests/ -v
+# 20 passed in 1.84s (RMSNorm, RoPE, MHA/GQA, Dynamic/Static/Paged KV Cache,
+# Greedy/Temp/Top-K/Repetition Penalty, INT8/INT4 Quantization, Demo Bootstrap, REST API & SSE)
+```
+
+<img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
 <div align="center">
 
-| Model | Parameters | VRAM (INT8) | Throughput | Hub Checkpoint |
-|:---|:---:|:---:|:---:|:---|
-| **Qwen2.5-0.5B-Expert** | 502M | ~480 MB | 48.3 tps | [`ivin-baiju/qwen2.5-0.5b-expert`](https://huggingface.co/ivin-baiju/qwen2.5-0.5b-expert) |
-| Qwen2.5-3B-Instruct | 3.09B | 4.13 GB | ~15 tps | [`Qwen/Qwen2.5-3B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) |
-| Qwen2.5-0.5B-Instruct | 502M | ~480 MB | 48.3 tps | [`Qwen/Qwen2.5-0.5B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) |
-
-</div>
-
----
-
-## ◈ Fine-Tuning & Custom Expert Models
-
-The repository includes a turnkey LoRA fine-tuning pipeline built on PEFT + TRL, specialized across 4 core domains:
-
-- **Domains** — **Medicine & Pharmacology** · **Cinema & Screenplay Theory** · **Systems Programming (C++)** · **Scientific Research Methodology**
-- **Dataset** — Formatted conversational training pairs in [`training/dataset.jsonl`](training/dataset.jsonl)
-- **Config** — LoRA rank 64, alpha 128, targeting attention projections (`q_proj`, `v_proj`)
-- **Trainable** — 8.8M parameters (1.75% of model weights)
-- **Training Results** — Cross-entropy loss dropped from **2.744 → 1.566** over 5 epochs
-- **Auto-Merge** — Adapters are automatically merged into standalone checkpoints saved to `models/checkpoints/qwen2.5-0.5b-expert/` for zero-overhead inference
-
-### Re-training or Training Your Own Model:
-```bash
-python training/train_lora.py
-```
-
-### Publishing Checkpoints to Hugging Face:
-To publish your fine-tuned weights publicly:
-```bash
-# Interactive helper
-python training/upload_hf.py
-
-# Or via HF CLI
-hf auth login
-hf upload your-username/qwen2.5-0.5b-expert models/checkpoints/qwen2.5-0.5b-expert .
-```
-
----
-
-## ◈ Testing
-
-```bash
-pytest tests/ -v  # 19 tests, all passing
-```
-
----
-
-## ◈ License
-
-Released under the **MIT License**. See [LICENSE](LICENSE) for details.
-
----
-
-## ◈ Acknowledgements
-
-- **Qwen Team** (Alibaba Cloud) — Qwen2.5 model weights and architecture documentation
-- **PyTorch Team** — MPS backend for Apple Silicon acceleration
-- **HuggingFace** — `safetensors` format and `transformers` reference implementations
-- **vLLM Project** — PagedAttention inspiration for the paged KV cache
-
----
-
-<div align="center">
-
-<sub>Built with PyTorch on Apple Silicon · Custom SLM Inference Engine</sub>
+**Released under the [MIT License](LICENSE)** · Hand-crafted with PyTorch for Apple Silicon Unified Memory
 
 </div>

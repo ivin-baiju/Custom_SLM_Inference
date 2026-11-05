@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 410" width="100%" height="410" role="img" aria-label="Animated 6-Stage Autoregressive GQA &amp; Zero-Copy Safetensors Execution Pipeline">
+  <defs>
+    <linearGradient id="panelSurface" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <linearGradient id="memBarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="60%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#0D9488"/>
+    </linearGradient>
+    <style>
+      .display { font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .sans { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .mono { font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+      @keyframes stageHighlight1 { 0%, 16% { stroke: #2563EB; stroke-width: 2.2; } 17%, 100% { stroke: #D4DFED; stroke-width: 1.2; } }
+      @keyframes stageHighlight2 { 0%, 16% { stroke: #D4DFED; stroke-width: 1.2; } 17%, 33% { stroke: #2563EB; stroke-width: 2.2; } 34%, 100% { stroke: #D4DFED; stroke-width: 1.2; } }
+      @keyframes stageHighlight3 { 0%, 33% { stroke: #D4DFED; stroke-width: 1.2; } 34%, 50% { stroke: #4F46E5; stroke-width: 2.2; } 51%, 100% { stroke: #D4DFED; stroke-width: 1.2; } }
+      @keyframes stageHighlight4 { 0%, 50% { stroke: #D4DFED; stroke-width: 1.2; } 51%, 67% { stroke: #2563EB; stroke-width: 2.2; } 68%, 100% { stroke: #D4DFED; stroke-width: 1.2; } }
+      @keyframes stageHighlight5 { 0%, 67% { stroke: #D4DFED; stroke-width: 1.2; } 68%, 84% { stroke: #0D9488; stroke-width: 2.2; } 85%, 100% { stroke: #D4DFED; stroke-width: 1.2; } }
+      @keyframes stageHighlight6 { 0%, 84% { stroke: #D4DFED; stroke-width: 1.2; } 85%, 100% { stroke: #059669; stroke-width: 2.2; } }
+
+      @keyframes badgeGlow1 { 0%, 16% { fill: #2563EB; } 17%, 100% { fill: #E6ECF4; } }
+      @keyframes badgeGlow2 { 0%, 16% { fill: #E6ECF4; } 17%, 33% { fill: #2563EB; } 34%, 100% { fill: #E6ECF4; } }
+      @keyframes badgeGlow3 { 0%, 33% { fill: #E6ECF4; } 34%, 50% { fill: #4F46E5; } 51%, 100% { fill: #E6ECF4; } }
+      @keyframes badgeGlow4 { 0%, 50% { fill: #E6ECF4; } 51%, 67% { fill: #2563EB; } 68%, 100% { fill: #E6ECF4; } }
+      @keyframes badgeGlow5 { 0%, 67% { fill: #E6ECF4; } 68%, 84% { fill: #0D9488; } 85%, 100% { fill: #E6ECF4; } }
+      @keyframes badgeGlow6 { 0%, 84% { fill: #E6ECF4; } 85%, 100% { fill: #059669; } }
+
+      .card-1 { animation: stageHighlight1 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .card-2 { animation: stageHighlight2 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .card-3 { animation: stageHighlight3 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .card-4 { animation: stageHighlight4 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .card-5 { animation: stageHighlight5 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .card-6 { animation: stageHighlight6 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+
+      .pill-1 { animation: badgeGlow1 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .pill-2 { animation: badgeGlow2 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .pill-3 { animation: badgeGlow3 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .pill-4 { animation: badgeGlow4 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .pill-5 { animation: badgeGlow5 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .pill-6 { animation: badgeGlow6 6s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+    </style>
+  </defs>
+
+  <!-- Chassis Background -->
+  <rect x="2" y="2" width="1196" height="406" rx="16" fill="#F1F4F9" stroke="#CBD5E1" stroke-width="1.5"/>
+
+  <!-- Header Bar -->
+  <text x="32" y="36" fill="#0B121E" font-size="13" font-weight="700" letter-spacing="0.6" class="mono">01 · AUTOREGRESSIVE TENSOR GRAPH &amp; SAFETENSORS ZERO-COPY EXECUTION PIPELINE</text>
+  <text x="1168" y="36" text-anchor="end" fill="#2563EB" font-size="11.5" font-weight="600" class="mono">COSINE PARITY: 1.00000179 VS HF</text>
+  <line x1="32" y1="50" x2="1168" y2="50" stroke="#D4DFED" stroke-width="1"/>
+
+  <!-- Backplane Bus Line -->
+  <line x1="60" y1="168" x2="1140" y2="168" stroke="#CBD5E1" stroke-width="3"/>
+
+  <!-- STAGE 1: Tokenize & Embed -->
+  <g transform="translate(32, 68)">
+    <rect width="176" height="198" rx="12" fill="url(#panelSurface)" class="card-1"/>
+    <rect x="12" y="12" width="38" height="22" rx="6" class="pill-1"/>
+    <text x="31" y="27" text-anchor="middle" fill="#0B121E" font-size="10.5" font-weight="700" class="mono">S01</text>
+    <text x="58" y="27" fill="#64748B" font-size="10" font-weight="600" class="mono">EMBEDDING</text>
+    <text x="14" y="56" fill="#0B121E" font-size="14.5" font-weight="700" class="display">Tokenize &amp; Lookup</text>
+    <text x="14" y="80" fill="#475569" font-size="11.5" class="sans">• ChatML template format</text>
+    <text x="14" y="100" fill="#475569" font-size="11.5" class="sans">• Vocab lookup table</text>
+    <text x="14" y="120" fill="#475569" font-size="11.5" class="sans">• Tied / untied embed</text>
+    <text x="14" y="140" fill="#475569" font-size="11.5" class="sans">• FP16 hidden tensor</text>
+    <rect x="12" y="158" width="152" height="26" rx="6" fill="#E6ECF4"/>
+    <text x="88" y="175" text-anchor="middle" fill="#2563EB" font-size="10.5" font-weight="600" class="mono">[B, L, D=896]</text>
+  </g>
+
+  <!-- STAGE 2: Pre-Attn RMSNorm -->
+  <g transform="translate(222, 68)">
+    <rect width="176" height="198" rx="12" fill="url(#panelSurface)" class="card-2"/>
+    <rect x="12" y="12" width="38" height="22" rx="6" class="pill-2"/>
+    <text x="31" y="27" text-anchor="middle" fill="#0B121E" font-size="10.5" font-weight="700" class="mono">S02</text>
+    <text x="58" y="27" fill="#64748B" font-size="10" font-weight="600" class="mono">RMSNORM</text>
+    <text x="14" y="56" fill="#0B121E" font-size="14.5" font-weight="700" class="display">Root Mean Square</text>
+    <text x="14" y="80" fill="#475569" font-size="11.5" class="sans">• FP32 variance upcast</text>
+    <text x="14" y="100" fill="#475569" font-size="11.5" class="sans">• rsqrt(mean(x²) + ε)</text>
+    <text x="14" y="120" fill="#475569" font-size="11.5" class="sans">• ε = 1e-6 stability</text>
+    <text x="14" y="140" fill="#475569" font-size="11.5" class="sans">• Learned γ scaling</text>
+    <rect x="12" y="158" width="152" height="26" rx="6" fill="#E6ECF4"/>
+    <text x="88" y="175" text-anchor="middle" fill="#2563EB" font-size="10.5" font-weight="600" class="mono">x · rsqrt(E[x²]+ε)</text>
+  </g>
+
+  <!-- STAGE 3: RoPE & QKV Proj -->
+  <g transform="translate(412, 68)">
+    <rect width="176" height="198" rx="12" fill="url(#panelSurface)" class="card-3"/>
+    <rect x="12" y="12" width="38" height="22" rx="6" class="pill-3"/>
+    <text x="31" y="27" text-anchor="middle" fill="#0B121E" font-size="10.5" font-weight="700" class="mono">S03</text>
+    <text x="58" y="27" fill="#64748B" font-size="10" font-weight="600" class="mono">RoPE 2D ROT</text>
+    <text x="14" y="56" fill="#0B121E" font-size="14.5" font-weight="700" class="display">QKV + Rotary Pos</text>
+    <text x="14" y="80" fill="#475569" font-size="11.5" class="sans">• INT8/INT4 linear proj</text>
+    <text x="14" y="100" fill="#475569" font-size="11.5" class="sans">• θ = 1,000,000 base</text>
+    <text x="14" y="120" fill="#475569" font-size="11.5" class="sans">• Cached cos/sin tables</text>
+    <text x="14" y="140" fill="#475569" font-size="11.5" class="sans">• Relative offset m - n</text>
+    <rect x="12" y="158" width="152" height="26" rx="6" fill="#E6ECF4"/>
+    <text x="88" y="175" text-anchor="middle" fill="#4F46E5" font-size="10.5" font-weight="600" class="mono">[B, Hq=14, L, 64]</text>
+  </g>
+
+  <!-- STAGE 4: GQA + KV Cache -->
+  <g transform="translate(602, 68)">
+    <rect width="176" height="198" rx="12" fill="url(#panelSurface)" class="card-4"/>
+    <rect x="12" y="12" width="38" height="22" rx="6" class="pill-4"/>
+    <text x="31" y="27" text-anchor="middle" fill="#0B121E" font-size="10.5" font-weight="700" class="mono">S04</text>
+    <text x="58" y="27" fill="#64748B" font-size="10" font-weight="600" class="mono">GQA + CACHE</text>
+    <text x="14" y="56" fill="#0B121E" font-size="14.5" font-weight="700" class="display">Grouped-Query</text>
+    <text x="14" y="80" fill="#475569" font-size="11.5" class="sans">• Dynamic / Static / Paged</text>
+    <text x="14" y="100" fill="#475569" font-size="11.5" class="sans">• 7:1 KV head sharing</text>
+    <text x="14" y="120" fill="#475569" font-size="11.5" class="sans">• repeat_interleave KV</text>
+    <text x="14" y="140" fill="#475569" font-size="11.5" class="sans">• Causal upper-tri mask</text>
+    <rect x="12" y="158" width="152" height="26" rx="6" fill="#E6ECF4"/>
+    <text x="88" y="175" text-anchor="middle" fill="#2563EB" font-size="10.5" font-weight="600" class="mono">Hkv=2 → Hq=14</text>
+  </g>
+
+  <!-- STAGE 5: SwiGLU MLP -->
+  <g transform="translate(792, 68)">
+    <rect width="176" height="198" rx="12" fill="url(#panelSurface)" class="card-5"/>
+    <rect x="12" y="12" width="38" height="22" rx="6" class="pill-5"/>
+    <text x="31" y="27" text-anchor="middle" fill="#0B121E" font-size="10.5" font-weight="700" class="mono">S05</text>
+    <text x="58" y="27" fill="#64748B" font-size="10" font-weight="600" class="mono">SWIGLU MLP</text>
+    <text x="14" y="56" fill="#0B121E" font-size="14.5" font-weight="700" class="display">Gated FeedForward</text>
+    <text x="14" y="80" fill="#475569" font-size="11.5" class="sans">• Post-attn RMSNorm</text>
+    <text x="14" y="100" fill="#475569" font-size="11.5" class="sans">• SiLU(gate) ⊙ up_proj</text>
+    <text x="14" y="120" fill="#475569" font-size="11.5" class="sans">• Intermediate D_ff=4864</text>
+    <text x="14" y="140" fill="#475569" font-size="11.5" class="sans">• Residual stream add</text>
+    <rect x="12" y="158" width="152" height="26" rx="6" fill="#E6ECF4"/>
+    <text x="88" y="175" text-anchor="middle" fill="#0D9488" font-size="10.5" font-weight="600" class="mono">[B, L, Dff=4864]</text>
+  </g>
+
+  <!-- STAGE 6: LM Head & Sampler -->
+  <g transform="translate(982, 68)">
+    <rect width="186" height="198" rx="12" fill="url(#panelSurface)" class="card-6"/>
+    <rect x="12" y="12" width="38" height="22" rx="6" class="pill-6"/>
+    <text x="31" y="27" text-anchor="middle" fill="#0B121E" font-size="10.5" font-weight="700" class="mono">S06</text>
+    <text x="58" y="27" fill="#64748B" font-size="10" font-weight="600" class="mono">SAMPLE + SSE</text>
+    <text x="14" y="56" fill="#0B121E" font-size="14.5" font-weight="700" class="display">Logits &amp; Telemetry</text>
+    <text x="14" y="80" fill="#475569" font-size="11.5" class="sans">• Repetition penalty</text>
+    <text x="14" y="100" fill="#475569" font-size="11.5" class="sans">• Temp / Top-K / Top-P</text>
+    <text x="14" y="120" fill="#475569" font-size="11.5" class="sans">• InferenceProfiler span</text>
+    <text x="14" y="140" fill="#475569" font-size="11.5" class="sans">• OpenAI SSE chunk out</text>
+    <rect x="12" y="158" width="162" height="26" rx="6" fill="#E6ECF4"/>
+    <text x="93" y="175" text-anchor="middle" fill="#059669" font-size="10.5" font-weight="600" class="mono">[B, 1, V=151936]</text>
+  </g>
+
+  <!-- Bottom Bar: Zero-Copy Safetensors Memory Compression Comparison -->
+  <g transform="translate(32, 286)">
+    <rect width="1136" height="98" rx="12" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1.2"/>
+    <text x="20" y="26" fill="#0B121E" font-size="11.5" font-weight="700" letter-spacing="0.5" class="mono">02 · ZERO-COPY safe_open STREAMING VS STANDARD HUGGINGFACE LOADING (QWEN2.5-3B ON 16 GB MAC)</text>
+
+    <!-- Standard HF OOM Bar -->
+    <text x="20" y="52" fill="#64748B" font-size="11" font-weight="600" class="mono">Standard HF Load</text>
+    <rect x="165" y="40" width="720" height="16" rx="4" fill="#FEE2E2" stroke="#FCA5A5" stroke-width="1"/>
+    <rect x="165" y="40" width="585" height="16" rx="4" fill="#DC2626"/>
+    <text x="900" y="52" fill="#DC2626" font-size="11" font-weight="700" class="mono">13.00 GB Peak (OOM Crash on 16 GB Unified RAM)</text>
+
+    <!-- Zero-Copy SLM Bar -->
+    <text x="20" y="78" fill="#0B121E" font-size="11" font-weight="700" class="mono">SLM Zero-Copy INT8</text>
+    <rect x="165" y="66" width="720" height="16" rx="4" fill="#E6ECF4"/>
+    <rect x="165" y="66" width="210" height="16" rx="4" fill="url(#memBarGrad)"/>
+    <text x="900" y="78" fill="#059669" font-size="11" font-weight="700" class="mono">4.13 GB Resident (68% Peak Reduction · Zero Duplication)</text>
+  </g>
+</svg>

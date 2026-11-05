@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 490" width="100%" height="490" role="img" aria-label="Animated 3-Workspace Anodized Silicon &amp; EUV Cobalt Inference Workbench">
+  <defs>
+    <linearGradient id="wbHeader" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <linearGradient id="tpotFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#2563EB" stop-opacity="0.0"/>
+    </linearGradient>
+    <style>
+      .display { font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .sans { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      .mono { font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+      @keyframes caretBlink {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0.15; }
+      }
+      @keyframes tabSlide {
+        0%, 45% { transform: translateX(0px); }
+        50%, 75% { transform: translateX(150px); }
+        80%, 95% { transform: translateX(300px); }
+        100% { transform: translateX(0px); }
+      }
+      @keyframes pipeStep1 { 0%, 20% { fill: #2563EB; } 21%, 100% { fill: #059669; } }
+      @keyframes pipeStep2 { 0%, 20% { fill: #E6ECF4; } 21%, 45% { fill: #2563EB; } 46%, 100% { fill: #059669; } }
+      @keyframes pipeStep3 { 0%, 45% { fill: #E6ECF4; } 46%, 80% { fill: #2563EB; } 81%, 100% { fill: #059669; } }
+      @keyframes pipeStep4 { 0%, 80% { fill: #E6ECF4; } 81%, 100% { fill: #0D9488; } }
+
+      .cursor { animation: caretBlink 0.9s steps(2, start) infinite; }
+      .tab-pill { animation: tabSlide 9s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+      .p-dot-1 { animation: pipeStep1 4.5s ease-in-out infinite; }
+      .p-dot-2 { animation: pipeStep2 4.5s ease-in-out infinite; }
+      .p-dot-3 { animation: pipeStep3 4.5s ease-in-out infinite; }
+      .p-dot-4 { animation: pipeStep4 4.5s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Outer Browser / Workbench Frame -->
+  <rect x="2" y="2" width="1196" height="486" rx="16" fill="#F1F4F9" stroke="#CBD5E1" stroke-width="1.5"/>
+
+  <!-- Top Navigation Bar (56px) -->
+  <rect x="2" y="2" width="1196" height="56" rx="16" fill="url(#wbHeader)" stroke="#D4DFED" stroke-width="1"/>
+  <!-- Window Controls + Brand -->
+  <circle cx="26" cy="30" r="5.5" fill="#CBD5E1"/>
+  <circle cx="44" cy="30" r="5.5" fill="#CBD5E1"/>
+  <circle cx="62" cy="30" r="5.5" fill="#CBD5E1"/>
+
+  <rect x="84" y="16" width="28" height="28" rx="7" fill="#0B121E"/>
+  <text x="98" y="34" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="700" class="mono">SLM</text>
+  <text x="122" y="28" fill="#0B121E" font-size="13.5" font-weight="700" class="display">SLM Runtime Workbench</text>
+  <text x="122" y="43" fill="#64748B" font-size="10" class="mono">ANODIZED SILICON · PYTORCH MPS</text>
+
+  <!-- Sliding 3-Workspace Segmented Switcher -->
+  <g transform="translate(390, 12)">
+    <rect x="0" y="0" width="454" height="36" rx="9" fill="#E6ECF4" stroke="#D4DFED" stroke-width="1"/>
+    <rect x="4" y="4" width="146" height="28" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1" class="tab-pill"/>
+    <text x="77"  y="22" text-anchor="middle" fill="#0B121E" font-size="11" font-weight="700" class="sans">1 · Console</text>
+    <text x="227" y="22" text-anchor="middle" fill="#475569" font-size="11" font-weight="600" class="sans">2 · Pipeline &amp; KV</text>
+    <text x="377" y="22" text-anchor="middle" fill="#475569" font-size="11" font-weight="600" class="sans">3 · Memory Lab</text>
+  </g>
+
+  <!-- Right Status & Theme Controls -->
+  <g transform="translate(876, 14)">
+    <rect x="0" y="0" width="196" height="32" rx="16" fill="#E6ECF4" stroke="#D4DFED" stroke-width="1"/>
+    <circle cx="16" cy="16" r="4.5" fill="#059669"/>
+    <text x="28" y="20" fill="#0B121E" font-size="10.5" font-weight="600" class="mono">READY · MPS · INT8</text>
+
+    <rect x="206" y="0" width="96" height="32" rx="8" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1"/>
+    <text x="254" y="20" text-anchor="middle" fill="#0B121E" font-size="11" font-weight="600" class="sans">⚙ Sampling</text>
+  </g>
+
+  <!-- LEFT PANEL: Primary Inference Console & Live 4-Stage Pipeline Bar -->
+  <g transform="translate(20, 72)">
+    <rect x="0" y="0" width="804" height="398" rx="14" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1.2"/>
+
+    <!-- Live 4-Stage Execution Pipeline Header Strip -->
+    <rect x="0" y="0" width="804" height="44" rx="14" fill="#F8FAFC" stroke="#D4DFED" stroke-width="1"/>
+    <text x="18" y="26" fill="#64748B" font-size="10" font-weight="700" letter-spacing="0.6" class="mono">EXECUTION PIPELINE</text>
+
+    <g transform="translate(156, 10)">
+      <rect x="0" y="0" width="118" height="24" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="14" cy="12" r="4" class="p-dot-1"/>
+      <text x="26" y="16" fill="#0B121E" font-size="10" font-weight="600" class="mono">1. Tokenize</text>
+
+      <rect x="128" y="0" width="114" height="24" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="142" cy="12" r="4" class="p-dot-2"/>
+      <text x="154" y="16" fill="#0B121E" font-size="10" font-weight="600" class="mono">2. Prefill</text>
+
+      <rect x="252" y="0" width="134" height="24" rx="6" fill="#EFF6FF" stroke="#2563EB"/>
+      <circle cx="266" cy="12" r="4" class="p-dot-3"/>
+      <text x="278" y="16" fill="#2563EB" font-size="10" font-weight="700" class="mono">3. GQA Decode</text>
+
+      <rect x="396" y="0" width="114" height="24" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="410" cy="12" r="4" class="p-dot-4"/>
+      <text x="422" y="16" fill="#0B121E" font-size="10" font-weight="600" class="mono">4. Output</text>
+    </g>
+    <text x="786" y="26" text-anchor="end" fill="#2563EB" font-size="10.5" font-weight="600" class="mono">48.3 tok/s · KV +64</text>
+
+    <!-- User Message Bubble -->
+    <g transform="translate(310, 62)">
+      <rect x="0" y="0" width="470" height="44" rx="12" fill="#0B121E"/>
+      <text x="18" y="26" fill="#F8FAFC" font-size="12.5" font-weight="500" class="sans">Compare Causal GQA vs Bidirectional Attention &amp; show KV tensor shapes</text>
+    </g>
+
+    <!-- Assistant Response Card with Code Block & Telemetry Receipt -->
+    <g transform="translate(24, 122)">
+      <rect x="0" y="0" width="28" height="28" rx="7" fill="#EFF6FF" stroke="#BFDBFE"/>
+      <text x="14" y="18" text-anchor="middle" fill="#2563EB" font-size="10.5" font-weight="700" class="mono">SLM</text>
+
+      <rect x="40" y="0" width="736" height="196" rx="12" fill="#F8FAFC" stroke="#D4DFED" stroke-width="1"/>
+      <text x="58" y="26" fill="#0B121E" font-size="12.5" font-weight="700" class="sans">Grouped-Query Attention (GQA) vs Bidirectional Attention</text>
+      <text x="58" y="48" fill="#475569" font-size="12" class="sans">In Qwen2.5, H_q = 14 query heads share H_kv = 2 key/value heads (7:1 ratio), cutting KV Cache VRAM by 85.7%:</text>
+
+      <!-- Dark Code Well Inside Message -->
+      <rect x="58" y="62" width="700" height="82" rx="8" fill="#0B121E"/>
+      <text x="74" y="82" fill="#94A3B8" font-size="10.5" class="mono"># Zero-overhead KV head expansion in models/architectures/transformer.py</text>
+      <text x="74" y="102" fill="#E2E8F0" font-size="11" class="mono">k_exp = k.repeat_interleave(num_kv_groups=7, dim=1)  # [B, 2, S, 64] -&gt; [B, 14, S, 64]</text>
+      <text x="74" y="122" fill="#38BDF8" font-size="11" class="mono">scores = torch.matmul(q, k_exp.transpose(-2, -1)) / math.sqrt(64) + causal_mask</text>
+      <rect x="615" y="111" width="7" height="14" rx="1.5" fill="#2563EB" class="cursor"/>
+
+      <!-- Per-Message Telemetry Receipt -->
+      <line x1="58" y1="158" x2="758" y2="158" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="58" y="178" fill="#64748B" font-size="10.5" font-weight="600" class="mono">TTFT: 36.8 ms   ·   SPEED: 48.3 tok/s   ·   AVG STEP: 20.7 ms   ·   KV Δ: +64 tokens   ·   CACHE: DynamicKVCache</text>
+    </g>
+
+    <!-- Bottom Composer Dock -->
+    <g transform="translate(24, 334)">
+      <rect x="0" y="0" width="756" height="48" rx="10" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+      <text x="16" y="28" fill="#64748B" font-size="12" class="sans">Ask a technical question or test inference parameters... (Enter to send)</text>
+      <rect x="646" y="8" width="100" height="32" rx="7" fill="#2563EB"/>
+      <text x="696" y="28" text-anchor="middle" fill="#FFFFFF" font-size="11.5" font-weight="600" class="sans">Generate →</text>
+    </g>
+  </g>
+
+  <!-- RIGHT PANEL: Live Hardware & KV Telemetry Rail -->
+  <g transform="translate(840, 72)">
+    <rect x="0" y="0" width="340" height="398" rx="14" fill="#FFFFFF" stroke="#D4DFED" stroke-width="1.2"/>
+    <text x="18" y="28" fill="#0B121E" font-size="11" font-weight="700" letter-spacing="0.6" class="mono">LIVE HARDWARE TELEMETRY</text>
+    <text x="322" y="28" text-anchor="end" fill="#0D9488" font-size="10" font-weight="600" class="mono">MPS · FP16/INT8</text>
+    <line x1="0" y1="42" x2="340" y2="42" stroke="#D4DFED" stroke-width="1"/>
+
+    <!-- 2x2 Readouts -->
+    <g transform="translate(16, 56)">
+      <rect x="0" y="0" width="148" height="58" rx="8" fill="#E6ECF4"/>
+      <text x="12" y="20" fill="#64748B" font-size="9.5" font-weight="600" class="mono">THROUGHPUT</text>
+      <text x="12" y="44" fill="#2563EB" font-size="18" font-weight="700" class="mono">48.3 tok/s</text>
+
+      <rect x="160" y="0" width="148" height="58" rx="8" fill="#E6ECF4"/>
+      <text x="172" y="20" fill="#64748B" font-size="9.5" font-weight="600" class="mono">FIRST TOKEN (TTFT)</text>
+      <text x="172" y="44" fill="#0B121E" font-size="18" font-weight="700" class="mono">36.8 ms</text>
+
+      <rect x="0" y="68" width="148" height="58" rx="8" fill="#E6ECF4"/>
+      <text x="12" y="88" fill="#64748B" font-size="9.5" font-weight="600" class="mono">STEP LATENCY</text>
+      <text x="12" y="112" fill="#0D9488" font-size="18" font-weight="700" class="mono">20.7 ms</text>
+
+      <rect x="160" y="68" width="148" height="58" rx="8" fill="#E6ECF4"/>
+      <text x="172" y="88" fill="#64748B" font-size="9.5" font-weight="600" class="mono">UNIFIED RAM</text>
+      <text x="172" y="112" fill="#4F46E5" font-size="18" font-weight="700" class="mono">4.13 GB</text>
+    </g>
+
+    <!-- TPOT Waveform Chart -->
+    <g transform="translate(16, 196)">
+      <text x="0" y="14" fill="#64748B" font-size="10" font-weight="600" class="mono">STEP-BY-STEP TPOT WAVEFORM (MS)</text>
+      <rect x="0" y="22" width="308" height="84" rx="8" fill="#F8FAFC" stroke="#D4DFED"/>
+      <path d="M 12 72 L 48 64 L 84 70 L 120 58 L 156 66 L 192 62 L 228 68 L 264 60 L 296 64 L 296 96 L 12 96 Z" fill="url(#tpotFill)"/>
+      <path d="M 12 72 L 48 64 L 84 70 L 120 58 L 156 66 L 192 62 L 228 68 L 264 60 L 296 64" fill="none" stroke="#2563EB" stroke-width="2"/>
+    </g>
+
+    <!-- 16-Page KV Cache Strip -->
+    <g transform="translate(16, 316)">
+      <text x="0" y="14" fill="#64748B" font-size="10" font-weight="600" class="mono">KV CACHE PAGE OCCUPANCY (128 / 2048)</text>
+      <g transform="translate(0, 24)">
+        <rect x="0"   y="0" width="16" height="16" rx="3" fill="#2563EB"/>
+        <rect x="19"  y="0" width="16" height="16" rx="3" fill="#2563EB"/>
+        <rect x="38"  y="0" width="16" height="16" rx="3" fill="#2563EB"/>
+        <rect x="57"  y="0" width="16" height="16" rx="3" fill="#2563EB"/>
+        <rect x="76"  y="0" width="16" height="16" rx="3" fill="#0D9488"/>
+        <rect x="95"  y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="114" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="133" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="152" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="171" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="190" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="209" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="228" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="247" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="266" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+        <rect x="285" y="0" width="16" height="16" rx="3" fill="#E6ECF4"/>
+      </g>
+      <text x="0" y="58" fill="#475569" font-size="10.5" class="mono">24 Layers · 14 Q / 2 KV Heads · θ = 1,000,000</text>
+    </g>
+  </g>
+</svg>

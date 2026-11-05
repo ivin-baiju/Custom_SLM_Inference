@@ -18,8 +18,8 @@ import logging
 import json
 from typing import Optional, List, Dict, Any
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, status
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Response, status
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
@@ -33,6 +33,7 @@ from server.endpoints import (
     UsageInfo,
     ModelLoadRequest,
     SwitchModelRequest,
+    DemoLoadRequest,
 )
 from server.streaming import stream_chat_completion
 
@@ -120,14 +121,47 @@ def get_engine_status():
     return global_engine.get_status()
 
 
+@app.post("/v1/models/demo")
+def load_demo_model_endpoint(req: Optional[DemoLoadRequest] = None):
+    """Bootstrap an instant micro Qwen2ForCausalLM safetensors checkpoint for live hardware verification."""
+    cfg = req or DemoLoadRequest()
+    try:
+        model_name = global_engine.load_synthetic_demo_model(
+            device=cfg.device,
+            precision=cfg.precision,
+            quantization=cfg.quantization,
+            cache_type=cfg.cache_type,
+        )
+        return {
+            "status": "loaded",
+            "model": model_name,
+            "is_synthetic_demo": True,
+        }
+    except Exception as e:
+        logger.exception("Failed to bootstrap synthetic demo model")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
 @app.post("/v1/models/load")
 def load_model_endpoint(req: ModelLoadRequest):
     try:
+        if req.path in ("qwen2.5-micro-synthetic", "synthetic-demo", "demo"):
+            model_name = global_engine.load_synthetic_demo_model(
+                device=req.device,
+                precision=req.precision,
+                quantization=req.quantization,
+                cache_type=req.cache_type,
+            )
+            return {"status": "loaded", "model": model_name}
+
         model_p = Path(req.path)
         if not model_p.exists():
             checkpoint_dir = Path(__file__).resolve().parent.parent / "models" / "checkpoints" / req.path
             if checkpoint_dir.exists():
                 model_p = checkpoint_dir
+
+        if global_engine.is_loaded:
+            global_engine.unload_model()
 
         global_engine.load_model(
             model_path=str(model_p),
@@ -145,6 +179,15 @@ def load_model_endpoint(req: ModelLoadRequest):
 @app.post("/v1/models/switch")
 def switch_model_endpoint(req: SwitchModelRequest):
     try:
+        if req.path in ("qwen2.5-micro-synthetic", "synthetic-demo", "demo"):
+            model_name = global_engine.load_synthetic_demo_model(
+                device=req.device,
+                precision=req.precision,
+                quantization=req.quantization,
+                cache_type=req.cache_type,
+            )
+            return {"status": "switched", "model": model_name}
+
         model_p = Path(req.path)
         if not model_p.exists():
             checkpoint_dir = Path(__file__).resolve().parent.parent / "models" / "checkpoints" / req.path
@@ -155,6 +198,8 @@ def switch_model_endpoint(req: SwitchModelRequest):
             new_model_path=str(model_p),
             device=req.device,
             precision=req.precision,
+            cache_type=req.cache_type,
+            quantization=req.quantization,
         )
         return {"status": "switched", "model": global_engine.lifecycle.current_model}
     except Exception as e:
@@ -178,17 +223,33 @@ async def chat_completions(req: ChatCompletionRequest):
     if req.stream:
         return EventSourceResponse(stream_chat_completion(req, global_engine))
 
-    # Non-streaming execution
+    # Non-streaming execution with telemetry
     messages_dicts = [{"role": m.role, "content": m.content} for m in req.messages]
+    stop_seqs = [req.stop] if isinstance(req.stop, str) else (req.stop or [])
     try:
-        response_text = global_engine.chat(
-            messages=messages_dicts,
+        if not global_engine.tokenizer_processor:
+            raise RuntimeError("No tokenizer available in engine.")
+
+        prompt = global_engine.tokenizer_processor.apply_chat_template(
+            messages_dicts, add_generation_prompt=True
+        )
+        chunks = []
+        last_meta: Dict[str, Any] = {}
+        for _, piece, meta in global_engine.generate_with_telemetry(
+            prompt=prompt,
             max_tokens=req.max_tokens,
             temperature=req.temperature,
             top_k=req.top_k,
             top_p=req.top_p,
-            stream=False,
-        )
+            repetition_penalty=req.repetition_penalty,
+            stop_sequences=stop_seqs,
+        ):
+            chunks.append(piece)
+            last_meta = meta
+
+        response_text = "".join(chunks)
+        prompt_tok = int(last_meta.get("prompt_tokens", len(global_engine.tokenizer_processor.encode(prompt))))
+        comp_tok = int(last_meta.get("completion_tokens", len(chunks)))
 
         return ChatCompletionResponse(
             model=global_engine.lifecycle.current_model or "slm",
@@ -200,18 +261,19 @@ async def chat_completions(req: ChatCompletionRequest):
                 )
             ],
             usage=UsageInfo(
-                prompt_tokens=len(req.messages[0].content.split()),
-                completion_tokens=len(response_text.split()),
-                total_tokens=len(req.messages[0].content.split()) + len(response_text.split()),
+                prompt_tokens=prompt_tok,
+                completion_tokens=comp_tok,
+                total_tokens=prompt_tok + comp_tok,
             ),
+            telemetry=last_meta or None,
         )
     except Exception as e:
         logger.exception("Error executing generation")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@app.get("/metrics")
+@app.get("/metrics", response_class=PlainTextResponse)
 def metrics_endpoint():
     """Prometheus-compatible plain text metrics."""
     from monitoring.metrics import MetricsCollector
-    return MetricsCollector.get_instance().format_prometheus()
+    return PlainTextResponse(MetricsCollector.get_instance().format_prometheus())

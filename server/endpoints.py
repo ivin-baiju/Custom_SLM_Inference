@@ -46,6 +46,7 @@ class ChatCompletionResponse(BaseModel):
     model: str
     choices: List[ChatCompletionChoice]
     usage: UsageInfo = Field(default_factory=UsageInfo)
+    telemetry: Optional[Dict[str, Any]] = None
 
 
 class DeltaMessage(BaseModel):
@@ -65,6 +66,7 @@ class ChatCompletionChunk(BaseModel):
     created: int = Field(default_factory=lambda: int(time.time()))
     model: str
     choices: List[StreamChoice]
+    telemetry: Optional[Dict[str, Any]] = None
 
 
 class ModelLoadRequest(BaseModel):
@@ -79,3 +81,12 @@ class SwitchModelRequest(BaseModel):
     path: str
     device: Optional[str] = "auto"
     precision: str = "fp16"
+    cache_type: str = "dynamic"
+    quantization: Optional[str] = None
+
+
+class DemoLoadRequest(BaseModel):
+    device: Optional[str] = "auto"
+    precision: str = "fp16"
+    cache_type: str = "dynamic"
+    quantization: Optional[str] = "int8"
