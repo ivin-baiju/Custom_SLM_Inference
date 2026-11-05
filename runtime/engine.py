@@ -42,7 +42,7 @@ class SyntheticDomainTokenizer:
             "1. **RAAS Suppression**: Prevents cleavage of decapeptide **Angiotensin I** into octapeptide **Angiotensin II**, "
             "reducing $\\text{AT}_1$-mediated arteriolar vasoconstriction and adrenal **aldosterone** secretion.\n"
             "2. **Kallikrein-Kinin Potentiation**: Inhibits degradation of **bradykinin**, elevating endothelial "
-            "$\\text{NO}$ and prostacyclin ($\\text{PGI}_2$) release for synergistic vasodilation.\n"
+            "nitric oxide ($\\text{NO}$) and prostacyclin ($\\text{PGI}_2$) release for synergistic vasodilation.\n"
             "3. **Renal Hemodynamics**: Preferentially dilates the **efferent arteriole**, lowering intraglomerular "
             "filtration pressure ($P_{GC}$) and halting proteinuric nephropathy progression."
         ),
@@ -70,7 +70,7 @@ class SyntheticDomainTokenizer:
             "- **Overload Resolution**: Casting an lvalue to `std::remove_reference_t<T>&&` causes the compiler to select "
             "`T(T&& other)` (the **move constructor**) instead of `T(const T& other)`.\n"
             "- **Pointer Stealing**: The receiving object's move constructor transfers ownership of heap pointers "
-            "(`data_`, `size_`, `capacity_`) in $O(1)$ registers and nulls out the source pointer."
+            "(`data_`, `size_`, `capacity_`) in `O(1)` register operations and nulls out the source pointer."
         ),
         "attention": (
             "### Causal vs. Bidirectional Self-Attention & GQA\n\n"
@@ -82,20 +82,20 @@ class SyntheticDomainTokenizer:
             "attn = torch.softmax(scores.float(), dim=-1).to(q.dtype) @ v_exp\n"
             "```\n\n"
             "- **Causal (Autoregressive)**: Applies a $-\\infty$ upper-triangular mask ($j > i$) so position $i$ attends "
-            "strictly to prefix tokens $\\le i$, enabling **KV Cache reuse** across decode steps in $O(T)$ per step.\n"
+            "strictly to prefix tokens $\\le i$, enabling **KV Cache reuse** across decode steps in `O(T)` per step.\n"
             "- **Bidirectional (Encoder)**: Unmasked full $T \\times T$ matrix where every token attends to both past and future context."
         ),
         "default": (
             "### SLM Runtime Execution Summary\n\n"
-            "Executing directly on the **custom PyTorch decoder pipeline** (`RMSNorm` $\\rightarrow$ `RoPE` $\\rightarrow$ "
-            "`Grouped-Query Attention` $\\rightarrow$ `SwiGLU`).\n\n"
+            "Executing directly on the **custom PyTorch decoder pipeline** (`RMSNorm` → `RoPE` → "
+            "`Grouped-Query Attention` → `SwiGLU`).\n\n"
             "```python\n"
             "# Zero-copy safe_open layer streaming + in-flight INT8 dequantization\n"
             "weight_fp16 = self.weight_int8.to(x.dtype) * self.weight_scale\n"
             "hidden = hidden + self.self_attn(self.input_layernorm(hidden), kv_cache=kv_cache)\n"
             "```\n\n"
             "- **Prefill Stage**: Processes the entire prompt sequence in parallel to populate the **KV Cache** across all transformer layers.\n"
-            "- **Decode Loop**: Generates tokens autoregressively at $O(1)$ query length per step, reading cached key-value states without recomputing prefix activations."
+            "- **Decode Loop**: Generates tokens autoregressively at `O(1)` query length per step, reading cached key-value states without recomputing prefix activations."
         ),
     }
 
