@@ -156,6 +156,39 @@ def status_cmd():
     console.print(Panel.fit(str(status), title="SLM Engine Status", border_style="cyan"))
 
 
+@cli.command("train")
+@click.option("--epochs", "-e", default=45, help="Number of LoRA training epochs")
+@click.option("--rank", "-r", default=32, help="LoRA rank r")
+@click.option("--alpha", "-a", default=64.0, help="LoRA scaling alpha")
+@click.option("--device", default="auto", help="Training device: auto, mps, cpu")
+def train_cmd(epochs, rank, alpha, device):
+    """Run LoRA fine-tuning and SVD spectral weight conditioning."""
+    repo_root = str(Path(__file__).resolve().parent.parent)
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
+    from training.train_lora import run_lora_training
+    console.print(f"[bold blue]Starting LoRA + SVD Weight Surgery (epochs={epochs}, r={rank}, alpha={alpha})...[/]")
+    summary = run_lora_training(
+        epochs=epochs,
+        lora_r=rank,
+        lora_alpha=alpha,
+        device_str=device,
+        reset_base_weights=True,
+    )
+    table = Table(title="SLM Weight Training & SVD Conditioning Summary")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Measured Result", style="green")
+    table.add_row("Accelerator Device", summary["device"])
+    table.add_row("Dataset Samples", f"{summary['dataset_samples']} multi-domain conversations (incl. unslop, logic, efficiency)")
+    table.add_row("LoRA Rank / Projections", f"r={summary['lora_rank']}, α={summary['lora_alpha']} ({summary['merged_projection_layers']} layers merged)")
+    table.add_row("Cross-Entropy Loss", f"{summary['initial_loss']:.4f} → {summary['final_loss']:.4f} (-{summary['loss_reduction_pct']}%)")
+    table.add_row("Perplexity", f"{summary['perplexity_before']} → {summary['perplexity_after']}")
+    table.add_row("Next-Token Accuracy", f"{summary['token_accuracy_before_pct']}% → {summary['token_accuracy_after_pct']}%")
+    table.add_row("Weight Delta ||ΔW||_F", f"{summary['weight_delta_frobenius_norm']} (Sparsity: {summary['structured_sparsity_pct']}%)")
+    table.add_row("Elapsed Time", f"{summary['elapsed_seconds']}s")
+    console.print(table)
+
+
 @cli.command("serve")
 @click.option("--host", default="0.0.0.0", help="Host interface to bind")
 @click.option("--port", default=8000, help="Port to listen on")

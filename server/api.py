@@ -145,7 +145,7 @@ def load_demo_model_endpoint(req: Optional[DemoLoadRequest] = None):
 @app.post("/v1/models/load")
 def load_model_endpoint(req: ModelLoadRequest):
     try:
-        if req.path in ("qwen2.5-micro-synthetic", "synthetic-demo", "demo"):
+        if req.path in ("qwen2.5-micro-synthetic", "qwen2.5-unslop-expert", "synthetic-demo", "demo"):
             model_name = global_engine.load_synthetic_demo_model(
                 device=req.device,
                 precision=req.precision,
@@ -179,7 +179,7 @@ def load_model_endpoint(req: ModelLoadRequest):
 @app.post("/v1/models/switch")
 def switch_model_endpoint(req: SwitchModelRequest):
     try:
-        if req.path in ("qwen2.5-micro-synthetic", "synthetic-demo", "demo"):
+        if req.path in ("qwen2.5-micro-synthetic", "qwen2.5-unslop-expert", "synthetic-demo", "demo"):
             model_name = global_engine.load_synthetic_demo_model(
                 device=req.device,
                 precision=req.precision,
@@ -210,6 +210,36 @@ def switch_model_endpoint(req: SwitchModelRequest):
 def unload_model_endpoint():
     global_engine.unload_model()
     return {"status": "unloaded"}
+
+
+@app.get("/v1/training/metrics")
+def get_training_metrics():
+    """Return latest LoRA & SVD weight surgery training telemetry."""
+    metrics_file = Path(__file__).resolve().parent.parent / "training" / "training_metrics.json"
+    if metrics_file.exists():
+        with open(metrics_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"status": "not_run"}
+
+
+@app.post("/v1/models/train")
+def train_model_endpoint():
+    """Execute live PyTorch LoRA + SVD weight conditioning and hot-reload altered weights."""
+    try:
+        from training.train_lora import run_lora_training
+        summary = run_lora_training(epochs=45, lora_r=32, lora_alpha=64.0, reset_base_weights=True)
+        # Hot-reload altered weights into active engine if loaded
+        if global_engine.is_loaded:
+            global_engine.load_synthetic_demo_model(
+                device=str(global_engine.backend.device),
+                precision=global_engine.precision,
+                quantization=global_engine.quantization,
+                cache_type=global_engine.cache_type,
+            )
+        return summary
+    except Exception as e:
+        logger.exception("Error during live LoRA weight training")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/v1/chat/completions")

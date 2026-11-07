@@ -204,7 +204,8 @@ class DynamicKVCache(KVCache):
         super().__init__(
             num_layers, num_kv_heads, head_dim, max_seq_len, dtype, device
         )
-        self._current_capacity = min(initial_size, max_seq_len)
+        self._initial_size = min(initial_size, max_seq_len)
+        self._current_capacity = self._initial_size
         self._growth_factor = growth_factor
 
     def _ensure_allocated(self, layer_idx: int, batch_size: int) -> None:
@@ -274,12 +275,19 @@ class DynamicKVCache(KVCache):
         self._current_capacity = new_cap
 
     def reset(self) -> None:
-        """Reset cache and release grown buffers."""
-        for i in range(self.num_layers):
-            self._keys[i] = None
-            self._values[i] = None
+        """Reset cache sequence pointer, reusing initial buffers to avoid reallocation churn."""
+        if self._current_capacity > self._initial_size:
+            for i in range(self.num_layers):
+                self._keys[i] = None
+                self._values[i] = None
+            self._current_capacity = self._initial_size
+        else:
+            for i in range(self.num_layers):
+                if self._keys[i] is not None and self._seq_len > 0:
+                    self._keys[i][:, :, : self._seq_len, :].zero_()
+                if self._values[i] is not None and self._seq_len > 0:
+                    self._values[i][:, :, : self._seq_len, :].zero_()
         self._seq_len = 0
-        self._current_capacity = min(256, self.max_seq_len)
 
 
 class StaticKVCache(KVCache):

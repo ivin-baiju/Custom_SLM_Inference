@@ -48,8 +48,11 @@ node_modules/
 out/
 
 # Model Checkpoints & Large Binaries (Download via CLI / HuggingFace)
-models/checkpoints/
-*.safetensors
+models/checkpoints/*
+!models/checkpoints/qwen2.5-micro-synthetic/
+!models/checkpoints/qwen2.5-micro-synthetic/**
+!models/checkpoints/qwen2.5-unslop-expert/
+!models/checkpoints/qwen2.5-unslop-expert/**
 *.bin
 *.pt
 *.pth

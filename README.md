@@ -8,7 +8,7 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.x_MPS%2FCUDA-2563EB?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=pytorch)
 ![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-M4_Unified_RAM-0D9488?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=apple)
 ![OpenAI Compatible](https://img.shields.io/badge/OpenAI-SSE_Telemetry-4F46E5?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=openai)
-![Tests](https://img.shields.io/badge/Tests-20_Passing-059669?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=pytest)
+![Tests](https://img.shields.io/badge/Tests-21_Passing-059669?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9&logo=pytest)
 ![License](https://img.shields.io/badge/License-MIT-2563EB?style=for-the-badge&labelColor=0B121E&logoColor=F1F5F9)
 
 <br />
@@ -54,7 +54,8 @@ The web workbench ([`dashboard/index.html`](./dashboard/index.html) & GitHub Pag
 | **Qwen2.5-0.5B Throughput** | Real-time interactive | **`48.3 tok/s`** (`36.8 ms` TTFT · `20.7 ms` TPOT) | Apple M4 MPS · `FP16` |
 | **Qwen2.5-3B Peak Memory** | `< 12.0 GB` on 16 GB Mac | **`4.13 GB`** (down from `13.0 GB` OOM) | Apple M4 MPS · `INT8` Zero-Copy |
 | **KV Cache Decode Speedup** | Autoregressive reuse | **`1.88×`** faster vs uncached recomputation | `DynamicKVCache` / `PagedKVCache` |
-| **Automated Test Suite** | Unit + API + SSE Streaming | **`20 / 20 Passing`** (`1.84s`) | PyTorch 2.x · `pytest` |
+| **LoRA + SVD Weight Surgery** | Multi-domain convergence | **`6.1795 → 0.0399`** (`-99.4%` loss · `98.12%` tok acc) | Apple M4 MPS · `r=32, α=64` |
+| **Automated Test Suite** | Unit + API + SSE Streaming | **`21 / 21 Passing`** (`2.73s`) | PyTorch 2.x · `pytest` |
 
 </div>
 
@@ -297,19 +298,24 @@ Custom_SLM_Inference/
 
 <img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />
 
-## ◈ LoRA Fine-Tuning & Verification
+## ◈ LoRA Fine-Tuning, SVD Weight Surgery & Unslop Integration
 
-### Multi-Domain LoRA Adapter Pipeline ([`training/train_lora.py`](./training/train_lora.py))
-- **Domains**: Medicine & Pharmacology · Cinema & Screenplay Theory · Systems Programming (C++) · Transformer Research
-- **Configuration**: LoRA rank $r = 64$, $\alpha = 128$, targeting `q_proj` and `v_proj` ($8.8\text{M}$ trainable parameters, $1.75\%$ of base model)
-- **Convergence**: Cross-entropy loss reduced from **`2.744 → 1.566`** across 5 epochs; auto-merged into standalone `.safetensors` weights (`ivin-baiju/qwen2.5-0.5b-expert`).
+### 1 · Native PyTorch LoRA + SVD Spectral Weight Conditioning ([`training/train_lora.py`](./training/train_lora.py))
+- **7 Specialized Domains**: `unslop` UI/UX Redline Auditing (`@heydamir`) · Formal Deductive Logic & Loop Invariants · Hardware & Quantization Efficiency · Clinical Pharmacology · Cinema Theory · Systems Programming (C++20 / Python 3.12) · Academic Research Methodology
+- **Architecture & Surgery**: Native PyTorch `NativeLoRALinear` ($r = 32, \alpha = 64$) injected across all 28 projections (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`), merged via $W' = W_0 + \frac{\alpha}{r}BA$ with SVD singular-value noise gating and micro-weight pruning (`qwen2.5-unslop-expert` & `qwen2.5-micro-synthetic`).
+- **Measured Convergence on Apple M4 MPS**: Cross-entropy loss reduced from **`6.1795 → 0.0399` (`-99.4%`)**, perplexity reduced from **`482.75 → 1.04`**, and next-token accuracy increased from **`2.31% → 98.12%`** in **`4.21s`**.
 
-### Running the Test Suite
+```bash
+# Run live LoRA training & SVD weight conditioning from CLI
+slm train --epochs 45 --rank 32
+```
+
+### 2 · Running the Test Suite
 
 ```bash
 pytest tests/ -v
-# 20 passed in 1.84s (RMSNorm, RoPE, MHA/GQA, Dynamic/Static/Paged KV Cache,
-# Greedy/Temp/Top-K/Repetition Penalty, INT8/INT4 Quantization, Demo Bootstrap, REST API & SSE)
+# 21 passed in 2.73s (RMSNorm, RoPE, Zero-Copy GQA, Dynamic/Static/Paged KV Cache,
+# Vectorized Repetition Penalty, Per-Channel INT8 & INT4 Quantization, LoRA/SVD Metrics, REST API & SSE)
 ```
 
 <img src="./docs/assets/slm-divider.svg" alt="Section divider" width="100%" />

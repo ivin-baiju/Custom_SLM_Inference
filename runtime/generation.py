@@ -36,14 +36,22 @@ def sample_token(
     # logits shape: (1, vocab_size) or (vocab_size,)
     if logits.dim() == 2:
         logits = logits.squeeze(0)
+    logits = logits.clone()
 
-    # 1. Repetition penalty
+    # 1. Vectorized repetition penalty (zero per-token CPU-GPU sync stalls)
     if gen_config.repetition_penalty != 1.0 and generated_tokens:
-        for prev_token in set(generated_tokens):
-            if logits[prev_token] < 0:
-                logits[prev_token] *= gen_config.repetition_penalty
-            else:
-                logits[prev_token] /= gen_config.repetition_penalty
+        unique_ids = torch.tensor(
+            list(set(generated_tokens)), dtype=torch.long, device=logits.device
+        )
+        valid_mask = (unique_ids >= 0) & (unique_ids < logits.size(-1))
+        unique_ids = unique_ids[valid_mask]
+        if unique_ids.numel() > 0:
+            selected = logits[unique_ids]
+            logits[unique_ids] = torch.where(
+                selected < 0,
+                selected * gen_config.repetition_penalty,
+                selected / gen_config.repetition_penalty,
+            )
 
     # 2. Greedy decoding
     if gen_config.temperature <= 1e-5:

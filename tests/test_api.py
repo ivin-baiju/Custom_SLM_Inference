@@ -89,3 +89,34 @@ def test_demo_model_bootstrap_and_chat_completions():
     unload_resp = client.post("/v1/models/unload")
     assert unload_resp.status_code == 200
     assert unload_resp.json()["status"] == "unloaded"
+
+
+def test_training_metrics_and_unslop_domain():
+    # Verify training metrics endpoint returns completed LoRA+SVD weight surgery metrics
+    metrics_resp = client.get("/v1/training/metrics")
+    assert metrics_resp.status_code == 200
+    data = metrics_resp.json()
+    assert data["status"] == "completed"
+    assert data["loss_reduction_pct"] > 90.0
+
+    # Load trained qwen2.5-unslop-expert checkpoint and query unslop redline audit
+    load_resp = client.post(
+        "/v1/models/load",
+        json={"path": "qwen2.5-unslop-expert", "device": "cpu", "precision": "fp16", "quantization": "int8"},
+    )
+    assert load_resp.status_code == 200
+
+    chat_resp = client.post(
+        "/v1/chat/completions",
+        json={
+            "messages": [{"role": "user", "content": "How do you unslop a vibecoded dashboard?"}],
+            "max_tokens": 16,
+            "temperature": 0.0,
+            "stream": False,
+        },
+    )
+    assert chat_resp.status_code == 200
+    content = chat_resp.json()["choices"][0]["message"]["content"]
+    assert "Unslop" in content
+
+    client.post("/v1/models/unload")

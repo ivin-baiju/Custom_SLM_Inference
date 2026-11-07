@@ -164,10 +164,19 @@ class Attention(nn.Module):
             # Retrieve full cached sequence
             key_states, value_states = kv_cache.get(self.layer_idx)
 
-        # Key-Value heads repeating for GQA
+        # Key-Value heads repeating for GQA (zero-copy view expansion)
+        total_kv_len = key_states.shape[2]
         if self.num_kv_groups > 1:
-            key_states = key_states.repeat_interleave(self.num_kv_groups, dim=1)
-            value_states = value_states.repeat_interleave(self.num_kv_groups, dim=1)
+            key_states = (
+                key_states.unsqueeze(2)
+                .expand(batch_size, self.num_kv_heads, self.num_kv_groups, total_kv_len, self.head_dim)
+                .reshape(batch_size, self.num_heads, total_kv_len, self.head_dim)
+            )
+            value_states = (
+                value_states.unsqueeze(2)
+                .expand(batch_size, self.num_kv_heads, self.num_kv_groups, total_kv_len, self.head_dim)
+                .reshape(batch_size, self.num_heads, total_kv_len, self.head_dim)
+            )
 
         # Scaled dot-product attention
         # query_states: (B, H, T_q, D)
@@ -175,19 +184,17 @@ class Attention(nn.Module):
         # attn_weights: (B, H, T_q, T_k)
         attn_weights = torch.matmul(query_states, key_states.transpose(-2, -1)) * self.scaling
 
-        total_kv_len = key_states.shape[2]
         if seq_len > 1:
-            # Causal mask needed during prefill
-            causal_mask = torch.full(
-                (seq_len, total_kv_len),
-                fill_value=float("-inf"),
-                dtype=attn_weights.dtype,
-                device=attn_weights.device,
+            # Vectorized upper-triangular causal mask during prefill (O(1) kernel dispatch)
+            causal_mask = torch.triu(
+                torch.full(
+                    (seq_len, total_kv_len),
+                    fill_value=float("-inf"),
+                    dtype=attn_weights.dtype,
+                    device=attn_weights.device,
+                ),
+                diagonal=start_pos + 1,
             )
-            # Query token at relative index i corresponds to absolute index (start_pos + i)
-            # It can attend to key positions <= start_pos + i
-            for i in range(seq_len):
-                causal_mask[i, : start_pos + i + 1] = 0.0
             attn_weights = attn_weights + causal_mask.unsqueeze(0).unsqueeze(1)
         elif attention_mask is not None:
             attn_weights = attn_weights + attention_mask

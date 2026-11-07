@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 def quantize_tensor_int8(tensor: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-    """Quantize a float tensor to symmetric int8.
+    """Quantize a float tensor to symmetric int8 (per-channel for >=2D weight matrices).
     
     Formula:
-        scale = max(|tensor|) / 127.0
+        scale = max(|tensor|, dim=-1, keepdim=True) / 127.0
         q = clip(round(tensor / scale), -127, 127).to(int8)
     
     Args:
@@ -29,7 +29,10 @@ def quantize_tensor_int8(tensor: torch.Tensor) -> Tuple[torch.Tensor, torch.Tens
     Returns:
         (quantized_tensor, scale)
     """
-    max_val = torch.max(torch.abs(tensor))
+    if tensor.dim() >= 2:
+        max_val = torch.amax(torch.abs(tensor), dim=-1, keepdim=True)
+    else:
+        max_val = torch.max(torch.abs(tensor))
     scale = (max_val / 127.0).clamp(min=1e-8)
     q = torch.clamp(torch.round(tensor / scale), -127, 127).to(torch.int8)
     return q, scale.to(tensor.dtype)
@@ -41,7 +44,7 @@ def dequantize_tensor_int8(quantized: torch.Tensor, scale: torch.Tensor) -> torc
 
 
 class QuantizedLinearInt8(nn.Module):
-    """Linear layer executing with INT8 weights and on-the-fly dequantization."""
+    """Linear layer executing with per-channel INT8 weights and on-the-fly dequantization."""
 
     def __init__(self, in_features: int, out_features: int, bias: bool = False):
         super().__init__()
@@ -50,7 +53,7 @@ class QuantizedLinearInt8(nn.Module):
         self.register_buffer(
             "weight_int8", torch.zeros((out_features, in_features), dtype=torch.int8)
         )
-        self.register_buffer("weight_scale", torch.ones((1,), dtype=torch.float16))
+        self.register_buffer("weight_scale", torch.ones((out_features, 1), dtype=torch.float16))
         if bias:
             self.bias = nn.Parameter(torch.zeros(out_features, dtype=torch.float16))
         else:
@@ -67,7 +70,7 @@ class QuantizedLinearInt8(nn.Module):
         with torch.no_grad():
             w_int8, scale = quantize_tensor_int8(linear.weight.data)
             q_layer.weight_int8.copy_(w_int8)
-            q_layer.weight_scale.copy_(scale.to(torch.float16))
+            q_layer.weight_scale.copy_(scale.to(torch.float16).view(linear.out_features, -1))
             if linear.bias is not None:
                 q_layer.bias.copy_(linear.bias.data.to(torch.float16))
         return q_layer
